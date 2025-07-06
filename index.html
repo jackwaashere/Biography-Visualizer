@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biography Scene Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Biography Scene Generator</h1>
+    <div class="container">
+        <div class="input-section">
+            <h2>Enter Biography</h2>
+            <div class="url-input">
+                <label for="url">Fetch from URL:</label>
+                <input type="text" id="url" placeholder="Enter URL">
+                <button id="fetch-btn">Fetch</button>
+            </div>
+            <div class="file-input">
+                <label for="file">Or upload a text file:</label>
+                <input type="file" id="file" accept=".txt">
+            </div>
+        </div>
+        <div class="content-section">
+            <button id="toggle-btn">Toggle to Display the Text Content</button>
+            <div id="content" class="collapsible">
+                <pre id="biography-text"></pre>
+            </div>
+        </div>
+    </div>
+    <div class="scene-section">
+        <button id="toggle-scenes-btn">Toggle to Display Scene Ideas</button>
+        <div id="scenes" class="collapsible"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

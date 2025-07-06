@@ -1,0 +1,49 @@
+body {
+    font-family: sans-serif;
+    margin: 20px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.input-section, .content-section, .scene-section {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.url-input, .file-input {
+    margin-bottom: 10px;
+}
+
+#toggle-btn, #toggle-scenes-btn {
+    margin-bottom: 10px;
+}
+
+.collapsible {
+    display: none;
+}
+
+#biography-text {
+    white-space: pre-wrap;
+}
+
+.scene {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+}
+
+.scene h3 {
+    margin-top: 0;
+}
+
+.scene code {
+    background-color: #f4f4f4;
+    padding: 2px 4px;
+    border-radius: 3px;
+}

@@ -1,0 +1,14 @@
+{
+  "name": "biography-scene-generator",
+  "version": "1.0.0",
+  "description": "A web application to generate scene ideas for biographies.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.14.1",
+    "dotenv": "^17.0.1",
+    "express": "^4.19.2"
+  }
+}
