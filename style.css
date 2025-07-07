@@ -1,6 +1,14 @@
 body {
-    font-family: sans-serif;
+    font-family: 'Roboto', sans-serif;
     margin: 20px;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+h1 {
+    font-size: 2em;
+    text-align: center;
+    color: #000000;
 }
 
 .container {
@@ -10,18 +18,53 @@ body {
 }
 
 .input-section, .content-section, .scene-section {
-    border: 1px solid #ccc;
+    background-color: #c8d0d5;
+    border: 1px solid #c8d0d5;
     padding: 20px;
+    border-radius: 8px;
+}
+
+.url-input {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+#url {
+    flex-grow: 1;
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #000000;
+    padding: 10px;
     border-radius: 5px;
 }
 
-.url-input, .file-input {
+.file-input {
     margin-bottom: 10px;
 }
 
+#fetch-btn, input[type="file"]::file-selector-button, #toggle-btn, #toggle-scenes-btn {
+    background-color: #4900ff;
+    color: #ffffff;
+    border: none;
+    padding: 15px 22.5px;
+    font-size: 1.5em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#fetch-btn:hover, input[type="file"]::file-selector-button:hover, #toggle-btn:hover, #toggle-scenes-btn:hover {
+    background-color: #3a00d1;
+}
+
+
 #toggle-btn, #toggle-scenes-btn {
     margin-bottom: 10px;
+    width: 100%;
 }
+
 
 .collapsible {
     display: none;
@@ -34,16 +77,22 @@ body {
 .scene {
     margin-bottom: 20px;
     padding: 10px;
-    border: 1px solid #eee;
+    border: 1px solid #444;
     border-radius: 5px;
+    background-color: #ffffff;
 }
 
 .scene h3 {
     margin-top: 0;
+    color: #000000;
 }
 
 .scene code {
-    background-color: #f4f4f4;
+    background-color: #f0f0f0;
     padding: 2px 4px;
     border-radius: 3px;
+}
+
+.scene p {
+    margin-bottom: 0;
 }
