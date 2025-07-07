@@ -33,14 +33,14 @@ async function generateScenes() {
             const data = await response.json();
             rawLlmResponse = JSON.stringify(data, null, 2);
             displayScenes(data.scenes);
-            generateScenesBtn.textContent = 'Generate Ideas';
+            generateScenesBtn.textContent = 'Generate Scene Ideas';
             generateScenesBtn.classList.remove('generating');
             generateScenesBtn.disabled = false;
             resultsSection.style.display = 'block';
         } catch (error) {
             console.error('Error generating scenes:', error);
             scenesDiv.innerHTML = '<p>Error generating scenes.</p>';
-            generateScenesBtn.textContent = 'Generate Ideas';
+            generateScenesBtn.textContent = 'Generate Scene Ideas';
             generateScenesBtn.classList.remove('generating');
             generateScenesBtn.disabled = false;
         }
@@ -56,8 +56,6 @@ function displayScenes(scenes) {
         sceneElement.innerHTML = `
             <h3>${scene.title}</h3>
             <p><strong>Human-friendly text:</strong> ${scene.human_text}</p>
-            <p><strong>Image prompt:</strong> <code>${scene.prompt}</code></p>
-            <p><strong>Video prompt:</strong> <code>${scene.video_prompt}</code></p>
         `;
         scenesDiv.appendChild(sceneElement);
     }
