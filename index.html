@@ -7,7 +7,9 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Biography Scene Generator</h1>
+    <header>
+        <h1>Biography Scene Generator</h1>
+    </header>
     <div class="container">
         <div class="input-section">
             <h2>Enter Biography</h2>
@@ -21,16 +23,21 @@
                 <input type="file" id="file" accept=".txt">
             </div>
         </div>
-        <div class="content-section">
-            <button id="toggle-btn">Toggle to Display the Text Content</button>
+        <div class="content-section" style="display: none;">
+            <button id="toggle-btn">Toggle to Display Text Content</button>
             <div id="content" class="collapsible">
                 <pre id="biography-text"></pre>
             </div>
         </div>
-    </div>
-    <div class="scene-section">
-        <button id="toggle-scenes-btn">Toggle to Display Scene Ideas</button>
-        <div id="scenes" class="collapsible"></div>
+        <div class="scene-section" style="display: none;">
+            <button id="generate-scenes-btn">Generate Ideas</button>
+        </div>
+        <div class="results-section" style="display: none;">
+            <button id="toggle-scenes-btn">Toggle to Display Scene Ideas</button>
+            <div id="scenes" class="collapsible"></div>
+            <button id="toggle-raw-llm-btn">Toggle Raw LLM Response</button>
+            <div id="raw-llm-response" class="collapsible"></div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

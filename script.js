@@ -1,16 +1,28 @@
 const fetchBtn = document.getElementById('fetch-btn');
 const urlInput = document.getElementById('url');
 const fileInput = document.getElementById('file');
+const contentSection = document.querySelector('.content-section');
+const sceneSection = document.querySelector('.scene-section');
+const resultsSection = document.querySelector('.results-section');
 const toggleBtn = document.getElementById('toggle-btn');
 const contentDiv = document.getElementById('content');
 const biographyText = document.getElementById('biography-text');
+const generateScenesBtn = document.getElementById('generate-scenes-btn');
 const toggleScenesBtn = document.getElementById('toggle-scenes-btn');
 const scenesDiv = document.getElementById('scenes');
+const toggleRawLlmBtn = document.getElementById('toggle-raw-llm-btn');
+const rawLlmResponseDiv = document.getElementById('raw-llm-response');
+
+let rawLlmResponse = '';
 
 async function generateScenes() {
     const text = biographyText.textContent;
     if (text) {
         try {
+            generateScenesBtn.textContent = 'Generating...';
+            generateScenesBtn.classList.add('generating');
+            generateScenesBtn.disabled = true;
+
             const response = await fetch('/generate-scenes', {
                 method: 'POST',
                 headers: {
@@ -19,10 +31,18 @@ async function generateScenes() {
                 body: JSON.stringify({ biographyText: text })
             });
             const data = await response.json();
+            rawLlmResponse = JSON.stringify(data, null, 2);
             displayScenes(data.scenes);
+            generateScenesBtn.textContent = 'Generate Ideas';
+            generateScenesBtn.classList.remove('generating');
+            generateScenesBtn.disabled = false;
+            resultsSection.style.display = 'block';
         } catch (error) {
             console.error('Error generating scenes:', error);
             scenesDiv.innerHTML = '<p>Error generating scenes.</p>';
+            generateScenesBtn.textContent = 'Generate Ideas';
+            generateScenesBtn.classList.remove('generating');
+            generateScenesBtn.disabled = false;
         }
     }
 }
@@ -43,6 +63,11 @@ function displayScenes(scenes) {
     }
 }
 
+function showSections() {
+    contentSection.style.display = 'block';
+    sceneSection.style.display = 'block';
+}
+
 fetchBtn.addEventListener('click', async () => {
     const url = urlInput.value;
     if (url) {
@@ -52,7 +77,7 @@ fetchBtn.addEventListener('click', async () => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(data.contents, 'text/html');
             biographyText.textContent = doc.body.innerText;
-            generateScenes();
+            showSections();
         } catch (error) {
             console.error('Error fetching URL:', error);
             biographyText.textContent = 'Error fetching URL.';
@@ -66,11 +91,13 @@ fileInput.addEventListener('change', () => {
         const reader = new FileReader();
         reader.onload = (e) => {
             biographyText.textContent = e.target.result;
-            generateScenes();
+            showSections();
         };
         reader.readAsText(file);
     }
 });
+
+generateScenesBtn.addEventListener('click', generateScenes);
 
 toggleBtn.addEventListener('click', () => {
     if (contentDiv.style.display === 'none' || contentDiv.style.display === '') {
@@ -78,7 +105,7 @@ toggleBtn.addEventListener('click', () => {
         toggleBtn.textContent = 'Hide Text Content';
     } else {
         contentDiv.style.display = 'none';
-        toggleBtn.textContent = 'Toggle to Display the Text Content';
+        toggleBtn.textContent = 'Toggle to Display Text Content';
     }
 });
 
@@ -89,5 +116,16 @@ toggleScenesBtn.addEventListener('click', () => {
     } else {
         scenesDiv.style.display = 'none';
         toggleScenesBtn.textContent = 'Toggle to Display Scene Ideas';
+    }
+});
+
+toggleRawLlmBtn.addEventListener('click', () => {
+    if (rawLlmResponseDiv.style.display === 'none' || rawLlmResponseDiv.style.display === '') {
+        rawLlmResponseDiv.textContent = rawLlmResponse;
+        rawLlmResponseDiv.style.display = 'block';
+        toggleRawLlmBtn.textContent = 'Hide Raw LLM Response';
+    } else {
+        rawLlmResponseDiv.style.display = 'none';
+        toggleRawLlmBtn.textContent = 'Toggle Raw LLM Response';
     }
 });

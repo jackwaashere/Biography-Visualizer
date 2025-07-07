@@ -1,23 +1,36 @@
 body {
     font-family: 'Roboto', sans-serif;
-    margin: 20px;
+    margin: 0;
     background-color: #ffffff;
     color: #000000;
+}
+
+header {
+    background-color: #c8d0d5;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
 }
 
 h1 {
     font-size: 2em;
     text-align: center;
     color: #000000;
+    margin: 0;
 }
 
 .container {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    margin-top: 100px; /* Adjust based on header height */
+    padding: 20px;
 }
 
-.input-section, .content-section, .scene-section {
+.input-section, .content-section, .scene-section, .results-section {
     background-color: #c8d0d5;
     border: 1px solid #c8d0d5;
     padding: 20px;
@@ -44,7 +57,7 @@ h1 {
     margin-bottom: 10px;
 }
 
-#fetch-btn, input[type="file"]::file-selector-button, #toggle-btn, #toggle-scenes-btn {
+#fetch-btn, input[type="file"]::file-selector-button, #toggle-btn, #toggle-scenes-btn, #generate-scenes-btn, #toggle-raw-llm-btn {
     background-color: #4900ff;
     color: #ffffff;
     border: none;
@@ -55,22 +68,25 @@ h1 {
     transition: background-color 0.3s;
 }
 
-#fetch-btn:hover, input[type="file"]::file-selector-button:hover, #toggle-btn:hover, #toggle-scenes-btn:hover {
+#fetch-btn:hover, input[type="file"]::file-selector-button:hover, #toggle-btn:hover, #toggle-scenes-btn:hover, #generate-scenes-btn:hover, #toggle-raw-llm-btn:hover {
     background-color: #3a00d1;
 }
 
+#generate-scenes-btn.generating {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
 
-#toggle-btn, #toggle-scenes-btn {
+#toggle-btn, #toggle-scenes-btn, #generate-scenes-btn, #toggle-raw-llm-btn {
     margin-bottom: 10px;
     width: 100%;
 }
-
 
 .collapsible {
     display: none;
 }
 
-#biography-text {
+#biography-text, #raw-llm-response {
     white-space: pre-wrap;
 }
 
@@ -95,4 +111,9 @@ h1 {
 
 .scene p {
     margin-bottom: 0;
+}
+
+label {
+    font-size: 1.2em;
+    margin-right: 10px;
 }
