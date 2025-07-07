@@ -55,7 +55,7 @@ function displayScenes(scenes) {
         sceneElement.classList.add('scene');
         sceneElement.innerHTML = `
             <h3>${scene.title}</h3>
-            <p><strong>Human-friendly text:</strong> ${scene.human_text}</p>
+            <p>${scene.human_text}</p>
         `;
         scenesDiv.appendChild(sceneElement);
     }
