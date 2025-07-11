@@ -159,12 +159,20 @@ scenesDiv.addEventListener('click', async (e) => {
 
         let promptForApi = originalPrompt;
         let imageUrlForApi = subjectImageBase64;
+        const isGhibliGenerationRequest = ghibliStyleCheckbox.checked;
 
-        if (ghibliStyleCheckbox.checked) {
-            const selectedImage = sceneElement.querySelector('input[type="radio"]:checked + label > img');
-            if (selectedImage) {
-                promptForApi = 'ghibli style';
-                imageUrlForApi = getBase64Image(selectedImage);
+        if (isGhibliGenerationRequest) {
+            const selectedImageElement = sceneElement.querySelector('input[type="radio"]:checked + label > img');
+            if (selectedImageElement) {
+                const selectedImageContainer = selectedImageElement.closest('.scene-image-item');
+                const isSelectedImageGhibli = selectedImageContainer && selectedImageContainer.dataset.isGhibli === 'true';
+
+                if (isSelectedImageGhibli) {
+                    promptForApi += ' strong ghibli style';
+                } else {
+                    promptForApi = 'ghibli style';
+                    imageUrlForApi = selectedImageElement.src;
+                }
             } else {
                 promptForApi += ' strong ghibli style';
             }
@@ -191,17 +199,20 @@ scenesDiv.addEventListener('click', async (e) => {
 
             const imageContainer = document.createElement('div');
             imageContainer.classList.add('scene-image-item');
+            
+            if (isGhibliGenerationRequest) {
+                imageContainer.dataset.isGhibli = 'true';
+            }
+
             imageContainer.innerHTML = `
                 <input type="radio" id="${imageId}" name="scene-image-${sceneKey}" checked>
                 <label for="${imageId}"><img src="${newImageUrl}" class="thumbnail"></label>
             `;
             sceneImagesContainer.appendChild(imageContainer);
 
-            generateImgBtn.textContent = 'Generate Image';
-            generateImgBtn.classList.remove('generating');
-            generateImgBtn.disabled = false;
         } catch (error) {
             console.error('Error generating image:', error);
+        } finally {
             generateImgBtn.textContent = 'Generate Image';
             generateImgBtn.classList.remove('generating');
             generateImgBtn.disabled = false;

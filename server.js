@@ -2,6 +2,7 @@ require('dotenv').config({ path: '.env.local' });
 const express = require('express');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const fal = require('@fal-ai/serverless-client');
+const axios = require('axios');
 
 if (process.env.FAL_API_KEY) {
     fal.config({
@@ -19,6 +20,17 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static('.'));
+
+async function urlToGenerativePart(url, mimeType) {
+    const response = await axios.get(url, { responseType: 'arraybuffer' });
+    const buffer = Buffer.from(response.data, 'binary');
+    return {
+        inlineData: {
+            data: buffer.toString('base64'),
+            mimeType
+        },
+    };
+}
 
 app.post('/generate-scenes', async (req, res) => {
     const { biographyText } = req.body;
@@ -64,12 +76,24 @@ ${biographyText}`;
 });
 
 app.post('/generate-image', async (req, res) => {
-    const { prompt, image_url } = req.body;
+    let { prompt, image_url } = req.body;
 
     console.log('--- Fal.ai Image Generation Request ---');
     console.log('Prompt:', prompt);
     if (image_url) {
-        console.log('Image URL included (first 50 chars):', image_url.substring(0, 50) + '...');
+        console.log('Image URL included:', image_url);
+        if (image_url.startsWith('http')) {
+            try {
+                const response = await axios.get(image_url, { responseType: 'arraybuffer' });
+                image_url = `data:image/png;base64,${Buffer.from(response.data, 'binary').toString('base64')}`;
+                console.log('Image URL converted to base64 (first 50 chars):', image_url.substring(0, 50) + '...');
+            } catch (error) {
+                console.error('Error fetching or converting image:', error);
+                return res.status(500).json({ error: 'Error fetching or converting image' });
+            }
+        } else {
+            console.log('Image URL is a base64 string (first 50 chars):', image_url.substring(0, 50) + '...');
+        }
     } else {
         console.log('No reference image included.');
     }
