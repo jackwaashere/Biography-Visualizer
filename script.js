@@ -150,20 +150,23 @@ scenesDiv.addEventListener('click', async (e) => {
     if (e.target.classList.contains('generate-img-btn')) {
         const sceneKey = e.target.dataset.sceneKey;
         const sceneElement = e.target.closest('.scene');
-        const sceneContent = sceneElement.querySelector('.scene-content p').textContent;
+        
+        const scenesData = JSON.parse(rawLlmResponse);
+        const originalPrompt = scenesData.scenes[sceneKey].prompt;
+
         const generateImgBtn = e.target;
         const sceneImagesContainer = sceneElement.querySelector('.scene-images');
 
-        let prompt = sceneContent;
-        let imageUrl = subjectImageBase64;
+        let promptForApi = originalPrompt;
+        let imageUrlForApi = subjectImageBase64;
 
         if (ghibliStyleCheckbox.checked) {
             const selectedImage = sceneElement.querySelector('input[type="radio"]:checked + label > img');
             if (selectedImage) {
-                prompt = 'ghibli style';
-                imageUrl = getBase64Image(selectedImage);
+                promptForApi = 'ghibli style';
+                imageUrlForApi = getBase64Image(selectedImage);
             } else {
-                prompt += ' strong ghibli style';
+                promptForApi += ' strong ghibli style';
             }
         }
 
@@ -178,8 +181,8 @@ scenesDiv.addEventListener('click', async (e) => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
-                    prompt,
-                    image_url: imageUrl
+                    prompt: promptForApi,
+                    image_url: imageUrlForApi
                 })
             });
             const data = await response.json();

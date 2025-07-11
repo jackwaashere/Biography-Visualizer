@@ -66,6 +66,15 @@ ${biographyText}`;
 app.post('/generate-image', async (req, res) => {
     const { prompt, image_url } = req.body;
 
+    console.log('--- Fal.ai Image Generation Request ---');
+    console.log('Prompt:', prompt);
+    if (image_url) {
+        console.log('Image URL included (first 50 chars):', image_url.substring(0, 50) + '...');
+    } else {
+        console.log('No reference image included.');
+    }
+    console.log('------------------------------------');
+
     try {
         const result = await fal.subscribe('fal-ai/flux-pro/kontext', {
             input: {
