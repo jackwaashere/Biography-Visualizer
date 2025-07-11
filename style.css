@@ -155,6 +155,10 @@ label {
     margin-right: 10px;
 }
 
+.options {
+    margin-bottom: 10px;
+}
+
 .popup {
     display: none;
     position: fixed;

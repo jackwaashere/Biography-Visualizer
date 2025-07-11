@@ -17,6 +17,7 @@ const imagePopup = document.getElementById('image-popup');
 const popupImg = document.getElementById('popup-img');
 const closeBtn = document.querySelector('.close-btn');
 const downloadBtn = document.getElementById('download-btn');
+const ghibliStyleCheckbox = document.getElementById('ghibli-style');
 
 let rawLlmResponse = '';
 let subjectImageBase64 = '';
@@ -93,6 +94,16 @@ async function downloadImage(url, filename) {
     URL.revokeObjectURL(link.href);
 }
 
+function getBase64Image(img) {
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    const dataURL = canvas.toDataURL("image/png");
+    return dataURL;
+}
+
 fetchBtn.addEventListener('click', async () => {
     const url = urlInput.value;
     if (url) {
@@ -143,6 +154,19 @@ scenesDiv.addEventListener('click', async (e) => {
         const generateImgBtn = e.target;
         const sceneImagesContainer = sceneElement.querySelector('.scene-images');
 
+        let prompt = sceneContent;
+        let imageUrl = subjectImageBase64;
+
+        if (ghibliStyleCheckbox.checked) {
+            const selectedImage = sceneElement.querySelector('input[type="radio"]:checked + label > img');
+            if (selectedImage) {
+                prompt = 'ghibli style';
+                imageUrl = getBase64Image(selectedImage);
+            } else {
+                prompt += ' strong ghibli style';
+            }
+        }
+
         try {
             generateImgBtn.textContent = 'Generating...';
             generateImgBtn.classList.add('generating');
@@ -154,19 +178,19 @@ scenesDiv.addEventListener('click', async (e) => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
-                    prompt: sceneContent,
-                    image_url: subjectImageBase64
+                    prompt,
+                    image_url: imageUrl
                 })
             });
             const data = await response.json();
-            const imageUrl = data.imageUrl;
+            const newImageUrl = data.imageUrl;
             const imageId = `image-${sceneKey}-${Date.now()}`;
 
             const imageContainer = document.createElement('div');
             imageContainer.classList.add('scene-image-item');
             imageContainer.innerHTML = `
                 <input type="radio" id="${imageId}" name="scene-image-${sceneKey}" checked>
-                <label for="${imageId}"><img src="${imageUrl}" class="thumbnail"></label>
+                <label for="${imageId}"><img src="${newImageUrl}" class="thumbnail"></label>
             `;
             sceneImagesContainer.appendChild(imageContainer);
 
