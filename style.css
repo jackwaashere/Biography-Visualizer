@@ -223,6 +223,9 @@ label {
     text-decoration: none;
     border-radius: 5px;
     transition: background-color 0.3s;
+    border: none;
+    font-size: 1em;
+    cursor: pointer;
 }
 
 #download-btn:hover {

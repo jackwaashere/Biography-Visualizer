@@ -226,7 +226,7 @@ scenesDiv.addEventListener('click', async (e) => {
         const filename = `scene${sceneNumber}-${sceneTitle.replace(/\s+/g, '-').toLowerCase()}.png`;
 
         popupImg.src = e.target.src;
-        downloadBtn.onclick = () => downloadImage(e.target.src, filename);
+        downloadBtn.onclick = () => downloadImage(popupImg.src, `scene${sceneNumber}-${sceneTitle.replace(/\s+/g, '-').toLowerCase()}.png`);
         imagePopup.style.display = 'flex';
     }
 });
