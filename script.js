@@ -76,6 +76,10 @@ function showSections() {
     sceneSection.style.display = 'block';
 }
 
+function closePopup() {
+    imagePopup.style.display = 'none';
+}
+
 fetchBtn.addEventListener('click', async () => {
     const url = urlInput.value;
     if (url) {
@@ -158,16 +162,22 @@ scenesDiv.addEventListener('click', async (e) => {
     if (e.target.classList.contains('thumbnail')) {
         popupImg.src = e.target.src;
         downloadBtn.href = e.target.src;
-        imagePopup.style.display = 'block';
+        imagePopup.style.display = 'flex';
     }
 });
 
-closeBtn.addEventListener('click', () => {
-    imagePopup.style.display = 'none';
+closeBtn.addEventListener('click', closePopup);
+downloadBtn.addEventListener('click', closePopup);
+imagePopup.addEventListener('click', (e) => {
+    if (e.target === imagePopup) {
+        closePopup();
+    }
 });
 
-downloadBtn.addEventListener('click', () => {
-    imagePopup.style.display = 'none';
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closePopup();
+    }
 });
 
 toggleBtn.addEventListener('click', () => {
@@ -198,5 +208,4 @@ toggleRawLlmBtn.addEventListener('click', () => {
     } else {
         rawLlmResponseDiv.style.display = 'none';
         toggleRawLlmBtn.textContent = 'Toggle Raw LLM Response';
-    }
-});
+    }n});

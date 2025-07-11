@@ -147,34 +147,47 @@ label {
     height: 100%;
     overflow: auto;
     background-color: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
 }
 
 .popup-content {
     position: relative;
-    margin: auto;
     padding: 20px;
-    width: 80%;
-    max-width: 700px;
-    top: 50%;
-    transform: translateY(-50%);
+    width: auto;
+    height: auto;
+    max-width: 90vw;
+    max-height: 90vh;
     background-color: #fff;
     border-radius: 5px;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .close-btn {
     position: absolute;
-    top: 10px;
-    right: 25px;
+    top: -10px;
+    right: -10px;
+    background-color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: #000;
-    font-size: 35px;
+    font-size: 25px;
     font-weight: bold;
     cursor: pointer;
+    border: 2px solid #000;
 }
 
 #popup-img {
-    width: 100%;
-    height: auto;
+    max-width: 100%;
+    max-height: 80vh;
     border-radius: 5px;
 }
 
@@ -205,5 +218,10 @@ label {
 
     .popup-content {
         width: 95%;
+        height: auto;
+    }
+
+    #popup-img {
+        max-height: 70vh;
     }
 }
