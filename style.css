@@ -120,8 +120,21 @@ h1 {
     margin-bottom: 0;
 }
 
-.scene-image {
-    flex-shrink: 0;
+.scene-images {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.scene-image-item {
+    position: relative;
+}
+
+.scene-image-item input[type="radio"] {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    margin: 0;
 }
 
 .thumbnail {
@@ -130,6 +143,11 @@ h1 {
     object-fit: cover;
     cursor: pointer;
     border-radius: 5px;
+    border: 2px solid transparent;
+}
+
+.scene-image-item input[type="radio"]:checked + label > .thumbnail {
+    border-color: #4900ff;
 }
 
 label {

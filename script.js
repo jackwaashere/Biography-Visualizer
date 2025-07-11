@@ -68,7 +68,7 @@ function displayScenes(scenes) {
                 <p>${scene.human_text}</p>
                 <button class="generate-img-btn" data-scene-key="${sceneKey}">Generate Image</button>
             </div>
-            <div class="scene-image"></div>
+            <div class="scene-images"></div>
         `;
         scenesDiv.appendChild(sceneElement);
     }
@@ -141,6 +141,7 @@ scenesDiv.addEventListener('click', async (e) => {
         const sceneElement = e.target.closest('.scene');
         const sceneContent = sceneElement.querySelector('.scene-content p').textContent;
         const generateImgBtn = e.target;
+        const sceneImagesContainer = sceneElement.querySelector('.scene-images');
 
         try {
             generateImgBtn.textContent = 'Generating...';
@@ -159,8 +160,16 @@ scenesDiv.addEventListener('click', async (e) => {
             });
             const data = await response.json();
             const imageUrl = data.imageUrl;
-            const sceneImage = sceneElement.querySelector('.scene-image');
-            sceneImage.innerHTML = `<img src="${imageUrl}" class="thumbnail">`;
+            const imageId = `image-${sceneKey}-${Date.now()}`;
+
+            const imageContainer = document.createElement('div');
+            imageContainer.classList.add('scene-image-item');
+            imageContainer.innerHTML = `
+                <input type="radio" id="${imageId}" name="scene-image-${sceneKey}" checked>
+                <label for="${imageId}"><img src="${imageUrl}" class="thumbnail"></label>
+            `;
+            sceneImagesContainer.appendChild(imageContainer);
+
             generateImgBtn.textContent = 'Generate Image';
             generateImgBtn.classList.remove('generating');
             generateImgBtn.disabled = false;
