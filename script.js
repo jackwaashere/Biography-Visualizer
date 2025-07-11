@@ -55,10 +55,13 @@ async function generateScenes() {
 
 function displayScenes(scenes) {
     scenesDiv.innerHTML = '';
+    let sceneCount = 1;
     for (const sceneKey in scenes) {
         const scene = scenes[sceneKey];
         const sceneElement = document.createElement('div');
         sceneElement.classList.add('scene');
+        sceneElement.dataset.sceneNumber = sceneCount++;
+        sceneElement.dataset.sceneTitle = scene.title;
         sceneElement.innerHTML = `
             <div class="scene-content">
                 <h3>${scene.title}</h3>
@@ -78,6 +81,16 @@ function showSections() {
 
 function closePopup() {
     imagePopup.style.display = 'none';
+}
+
+async function downloadImage(url, filename) {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(link.href);
 }
 
 fetchBtn.addEventListener('click', async () => {
@@ -160,14 +173,18 @@ scenesDiv.addEventListener('click', async (e) => {
     }
 
     if (e.target.classList.contains('thumbnail')) {
+        const sceneElement = e.target.closest('.scene');
+        const sceneNumber = sceneElement.dataset.sceneNumber;
+        const sceneTitle = sceneElement.dataset.sceneTitle;
+        const filename = `scene${sceneNumber}-${sceneTitle.replace(/\s+/g, '-').toLowerCase()}.png`;
+
         popupImg.src = e.target.src;
-        downloadBtn.href = e.target.src;
+        downloadBtn.onclick = () => downloadImage(e.target.src, filename);
         imagePopup.style.display = 'flex';
     }
 });
 
 closeBtn.addEventListener('click', closePopup);
-downloadBtn.addEventListener('click', closePopup);
 imagePopup.addEventListener('click', (e) => {
     if (e.target === imagePopup) {
         closePopup();
@@ -208,4 +225,5 @@ toggleRawLlmBtn.addEventListener('click', () => {
     } else {
         rawLlmResponseDiv.style.display = 'none';
         toggleRawLlmBtn.textContent = 'Toggle Raw LLM Response';
-    }n});
+    }
+});
