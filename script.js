@@ -1,6 +1,7 @@
 const fetchBtn = document.getElementById('fetch-btn');
 const urlInput = document.getElementById('url');
 const fileInput = document.getElementById('file');
+const subjectImageInput = document.getElementById('subject-image');
 const contentSection = document.querySelector('.content-section');
 const sceneSection = document.querySelector('.scene-section');
 const resultsSection = document.querySelector('.results-section');
@@ -12,8 +13,13 @@ const toggleScenesBtn = document.getElementById('toggle-scenes-btn');
 const scenesDiv = document.getElementById('scenes');
 const toggleRawLlmBtn = document.getElementById('toggle-raw-llm-btn');
 const rawLlmResponseDiv = document.getElementById('raw-llm-response');
+const imagePopup = document.getElementById('image-popup');
+const popupImg = document.getElementById('popup-img');
+const closeBtn = document.querySelector('.close-btn');
+const downloadBtn = document.getElementById('download-btn');
 
 let rawLlmResponse = '';
+let subjectImageBase64 = '';
 
 async function generateScenes() {
     const text = biographyText.textContent;
@@ -54,8 +60,12 @@ function displayScenes(scenes) {
         const sceneElement = document.createElement('div');
         sceneElement.classList.add('scene');
         sceneElement.innerHTML = `
-            <h3>${scene.title}</h3>
-            <p>${scene.human_text}</p>
+            <div class="scene-content">
+                <h3>${scene.title}</h3>
+                <p>${scene.human_text}</p>
+                <button class="generate-img-btn" data-scene-key="${sceneKey}">Generate Image</button>
+            </div>
+            <div class="scene-image"></div>
         `;
         scenesDiv.appendChild(sceneElement);
     }
@@ -95,7 +105,70 @@ fileInput.addEventListener('change', () => {
     }
 });
 
+subjectImageInput.addEventListener('change', () => {
+    const file = subjectImageInput.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            subjectImageBase64 = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
 generateScenesBtn.addEventListener('click', generateScenes);
+
+scenesDiv.addEventListener('click', async (e) => {
+    if (e.target.classList.contains('generate-img-btn')) {
+        const sceneKey = e.target.dataset.sceneKey;
+        const sceneElement = e.target.closest('.scene');
+        const sceneContent = sceneElement.querySelector('.scene-content p').textContent;
+        const generateImgBtn = e.target;
+
+        try {
+            generateImgBtn.textContent = 'Generating...';
+            generateImgBtn.classList.add('generating');
+            generateImgBtn.disabled = true;
+
+            const response = await fetch('/generate-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    prompt: sceneContent,
+                    image_url: subjectImageBase64
+                })
+            });
+            const data = await response.json();
+            const imageUrl = data.imageUrl;
+            const sceneImage = sceneElement.querySelector('.scene-image');
+            sceneImage.innerHTML = `<img src="${imageUrl}" class="thumbnail">`;
+            generateImgBtn.textContent = 'Generate Image';
+            generateImgBtn.classList.remove('generating');
+            generateImgBtn.disabled = false;
+        } catch (error) {
+            console.error('Error generating image:', error);
+            generateImgBtn.textContent = 'Generate Image';
+            generateImgBtn.classList.remove('generating');
+            generateImgBtn.disabled = false;
+        }
+    }
+
+    if (e.target.classList.contains('thumbnail')) {
+        popupImg.src = e.target.src;
+        downloadBtn.href = e.target.src;
+        imagePopup.style.display = 'block';
+    }
+});
+
+closeBtn.addEventListener('click', () => {
+    imagePopup.style.display = 'none';
+});
+
+downloadBtn.addEventListener('click', () => {
+    imagePopup.style.display = 'none';
+});
 
 toggleBtn.addEventListener('click', () => {
     if (contentDiv.style.display === 'none' || contentDiv.style.display === '') {

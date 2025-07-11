@@ -22,6 +22,10 @@
                 <label for="file">Or upload a text file:</label>
                 <input type="file" id="file" accept=".txt">
             </div>
+            <div class="file-input">
+                <label for="subject-image">Subject of the biography:</label>
+                <input type="file" id="subject-image" accept="image/*">
+            </div>
         </div>
         <div class="content-section" style="display: none;">
             <button id="toggle-btn">Toggle to Display Text Content</button>
@@ -39,6 +43,15 @@
             <div id="raw-llm-response" class="collapsible"></div>
         </div>
     </div>
+
+    <div id="image-popup" class="popup">
+        <div class="popup-content">
+            <span class="close-btn">&times;</span>
+            <img src="" alt="Generated Image" id="popup-img">
+            <a href="#" id="download-btn" download="generated_image.png">Download Image</a>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

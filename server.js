@@ -1,6 +1,13 @@
 require('dotenv').config({ path: '.env.local' });
 const express = require('express');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const fal = require('@fal-ai/serverless-client');
+
+if (process.env.FAL_API_KEY) {
+    fal.config({
+        credentials: process.env.FAL_API_KEY,
+    });
+}
 
 const app = express();
 const port = 3000;
@@ -10,7 +17,7 @@ const API_KEY = process.env.GEMINI_API_KEY;
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 app.use(express.static('.'));
 
 app.post('/generate-scenes', async (req, res) => {
@@ -53,6 +60,27 @@ ${biographyText}`;
     } catch (error) {
         console.error('Error generating scenes:', error);
         res.status(500).json({ error: 'Error generating scenes' });
+    }
+});
+
+app.post('/generate-image', async (req, res) => {
+    const { prompt, image_url } = req.body;
+
+    try {
+        const result = await fal.subscribe('fal-ai/flux-pro/kontext', {
+            input: {
+                prompt,
+                image_url
+            },
+            logs: true,
+            onQueueUpdate: (update) => {
+                console.log('queue update', update);
+            },
+        });
+        res.json({ imageUrl: result.images[0].url });
+    } catch (error) {
+        console.error('Error generating image:', error);
+        res.status(500).json({ error: 'Error generating image' });
     }
 });
 

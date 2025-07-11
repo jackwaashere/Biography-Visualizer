@@ -57,7 +57,7 @@ h1 {
     margin-bottom: 10px;
 }
 
-#fetch-btn, input[type="file"]::file-selector-button, #toggle-btn, #toggle-scenes-btn, #generate-scenes-btn, #toggle-raw-llm-btn {
+#fetch-btn, input[type="file"]::file-selector-button, #toggle-btn, #toggle-scenes-btn, #generate-scenes-btn, #toggle-raw-llm-btn, .generate-img-btn {
     background-color: #4900ff;
     color: #ffffff;
     border: none;
@@ -68,11 +68,11 @@ h1 {
     transition: background-color 0.3s;
 }
 
-#fetch-btn:hover, input[type="file"]::file-selector-button:hover, #toggle-btn:hover, #toggle-scenes-btn:hover, #generate-scenes-btn:hover, #toggle-raw-llm-btn:hover {
+#fetch-btn:hover, input[type="file"]::file-selector-button:hover, #toggle-btn:hover, #toggle-scenes-btn:hover, #generate-scenes-btn:hover, #toggle-raw-llm-btn:hover, .generate-img-btn:hover {
     background-color: #3a00d1;
 }
 
-#generate-scenes-btn.generating {
+#generate-scenes-btn.generating, .generate-img-btn.generating {
     background-color: #6c757d;
     cursor: not-allowed;
 }
@@ -96,6 +96,13 @@ h1 {
     border: 1px solid #444;
     border-radius: 5px;
     background-color: #ffffff;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.scene-content {
+    flex-grow: 1;
 }
 
 .scene h3 {
@@ -113,7 +120,90 @@ h1 {
     margin-bottom: 0;
 }
 
+.scene-image {
+    flex-shrink: 0;
+}
+
+.thumbnail {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
 label {
     font-size: 1.2em;
     margin-right: 10px;
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.8);
+}
+
+.popup-content {
+    position: relative;
+    margin: auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 700px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #fff;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 25px;
+    color: #000;
+    font-size: 35px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#popup-img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+#download-btn {
+    display: block;
+    margin-top: 20px;
+    background-color: #4900ff;
+    color: #ffffff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#download-btn:hover {
+    background-color: #3a00d1;
+}
+
+@media (max-width: 600px) {
+    .url-input {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #url {
+        margin-bottom: 10px;
+    }
+
+    .popup-content {
+        width: 95%;
+    }
 }
