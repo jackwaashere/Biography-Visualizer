@@ -10,48 +10,75 @@
     <header>
         <h1>Biography Scene Generator</h1>
         <div class="header-buttons">
-            <button id="save-btn">Save</button>
-            <input type="file" id="load-input" style="display: none;">
-            <button id="load-btn">Load</button>
+            <button id="save-btn">Save Session</button>
+            <input type="file" id="load-input" accept=".json" style="display: none;">
+            <button id="load-btn">Load Session</button>
         </div>
     </header>
-    <div class="container">
-        <div class="input-section">
-            <h2>Enter Biography</h2>
-            <div class="url-input">
-                <label for="url">Fetch from URL:</label>
-                <input type="text" id="url" placeholder="Enter URL">
-                <button id="fetch-btn">Fetch</button>
+
+    <main class="container">
+        <div class="left-panel">
+            <div class="panel-section">
+                <h2>1. Input Biography</h2>
+                <div class="input-group">
+                    <label for="url">Fetch from URL</label>
+                    <div class="url-input">
+                        <input type="text" id="url" placeholder="Enter a public URL">
+                        <button id="fetch-btn">Fetch</button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="file">Or upload a text file</label>
+                    <input type="file" id="file" accept=".txt">
+                </div>
+                 <div class="input-group">
+                    <label for="subject-image">Reference Image (Optional)</label>
+                    <input type="file" id="subject-image" accept="image/*">
+                </div>
             </div>
-            <div class="file-input">
-                <label for="file">Or upload a text file:</label>
-                <input type="file" id="file" accept=".txt">
+
+            <div class="panel-section" id="generation-controls" style="display: none;">
+                <h2>2. Generate Scenes</h2>
+                <button id="generate-scenes-btn">Generate Scene Ideas</button>
             </div>
-            <div class="file-input">
-                <label for="subject-image">Subject of the biography:</label>
-                <input type="file" id="subject-image" accept="image/*">
+            
+            <div class="panel-section" id="style-options" style="display: none;">
+                <h2>3. Styling Options</h2>
+                <div class="options">
+                    <input type="checkbox" id="ghibli-style">
+                    <label for="ghibli-style">Ghibli Style</label>
+                </div>
             </div>
         </div>
-        <div class="content-section" style="display: none;">
-            <button id="toggle-btn">Toggle to Display Text Content</button>
-            <div id="content" class="collapsible">
-                <pre id="biography-text"></pre>
+
+        <div class="right-panel">
+            <div class="panel-section content-section" style="display: none;">
+                <div class="panel-header">
+                    <h2>Biography Text</h2>
+                    <button id="toggle-btn" class="toggle-visibility-btn" aria-expanded="true">Hide</button>
+                </div>
+                <div id="content" class="collapsible show">
+                    <pre id="biography-text"></pre>
+                </div>
+            </div>
+
+            <div class="panel-section results-section" style="display: none;">
+                 <div class="panel-header">
+                    <h2>Generated Scenes</h2>
+                    <button id="toggle-scenes-btn" class="toggle-visibility-btn" aria-expanded="true">Hide</button>
+                </div>
+                <div id="scenes" class="collapsible show"></div>
+            </div>
+
+            <div class="panel-section raw-llm-section" style="display: none;">
+                <div class="panel-header">
+                    <h2>Raw LLM Response</h2>
+                    <button id="toggle-raw-llm-btn" class="toggle-visibility-btn" aria-expanded="false">Show</button>
+                </div>
+                <div id="raw-llm-response" class="collapsible"></div>
             </div>
         </div>
-        <div class="scene-section" style="display: none;">
-            <button id="generate-scenes-btn">Generate Scene Ideas</button>
-        </div>
-        <div class="results-section" style="display: none;">
-            <button id="toggle-scenes-btn">Toggle to Display Scene Ideas</button>
-            <div class="options">
-                <input type="checkbox" id="ghibli-style">
-                <label for="ghibli-style">Ghibli Style</label>
-            </div>
-            <div id="scenes" class="collapsible"></div>
-            <button id="toggle-raw-llm-btn">Toggle Raw LLM Response</button>
-            <div id="raw-llm-response" class="collapsible"></div>
-        </div>
-    </div>
+    </main>
 
     <div id="image-popup" class="popup">
         <div class="popup-content">

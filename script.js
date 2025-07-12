@@ -3,7 +3,6 @@ const urlInput = document.getElementById('url');
 const fileInput = document.getElementById('file');
 const subjectImageInput = document.getElementById('subject-image');
 const contentSection = document.querySelector('.content-section');
-const sceneSection = document.querySelector('.scene-section');
 const resultsSection = document.querySelector('.results-section');
 const toggleBtn = document.getElementById('toggle-btn');
 const contentDiv = document.getElementById('content');
@@ -18,6 +17,9 @@ const popupImg = document.getElementById('popup-img');
 const closeBtn = document.querySelector('.close-btn');
 const downloadBtn = document.getElementById('download-btn');
 const ghibliStyleCheckbox = document.getElementById('ghibli-style');
+const generationControls = document.getElementById('generation-controls');
+const styleOptions = document.getElementById('style-options');
+const rawLlmSection = document.querySelector('.raw-llm-section');
 
 let rawLlmResponse = '';
 let subjectImageBase64 = '';
@@ -73,11 +75,14 @@ function displayScenes(scenes) {
         `;
         scenesDiv.appendChild(sceneElement);
     }
+    styleOptions.style.display = 'block';
+    rawLlmSection.style.display = 'block';
+    resultsSection.style.display = 'block';
 }
 
 function showSections() {
     contentSection.style.display = 'block';
-    sceneSection.style.display = 'block';
+    generationControls.style.display = 'block';
 }
 
 function closePopup() {
@@ -269,34 +274,25 @@ window.addEventListener('keydown', (e) => {
 });
 
 toggleBtn.addEventListener('click', () => {
-    if (contentDiv.style.display === 'none' || contentDiv.style.display === '') {
-        contentDiv.style.display = 'block';
-        toggleBtn.textContent = 'Hide Text Content';
-    } else {
-        contentDiv.style.display = 'none';
-        toggleBtn.textContent = 'Toggle to Display Text Content';
-    }
+    const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+    contentDiv.classList.toggle('show');
+    toggleBtn.setAttribute('aria-expanded', !isExpanded);
+    toggleBtn.textContent = isExpanded ? 'Show' : 'Hide';
 });
 
 toggleScenesBtn.addEventListener('click', () => {
-    if (scenesDiv.style.display === 'none' || scenesDiv.style.display === '') {
-        scenesDiv.style.display = 'block';
-        toggleScenesBtn.textContent = 'Hide Scene Ideas';
-    } else {
-        scenesDiv.style.display = 'none';
-        toggleScenesBtn.textContent = 'Toggle to Display Scene Ideas';
-    }
+    const isExpanded = toggleScenesBtn.getAttribute('aria-expanded') === 'true';
+    scenesDiv.classList.toggle('show');
+    toggleScenesBtn.setAttribute('aria-expanded', !isExpanded);
+    toggleScenesBtn.textContent = isExpanded ? 'Show' : 'Hide';
 });
 
 toggleRawLlmBtn.addEventListener('click', () => {
-    if (rawLlmResponseDiv.style.display === 'none' || rawLlmResponseDiv.style.display === '') {
-        rawLlmResponseDiv.textContent = rawLlmResponse;
-        rawLlmResponseDiv.style.display = 'block';
-        toggleRawLlmBtn.textContent = 'Hide Raw LLM Response';
-    } else {
-        rawLlmResponseDiv.style.display = 'none';
-        toggleRawLlmBtn.textContent = 'Toggle Raw LLM Response';
-    }
+    const isExpanded = toggleRawLlmBtn.getAttribute('aria-expanded') === 'true';
+    rawLlmResponseDiv.classList.toggle('show');
+    rawLlmResponseDiv.textContent = rawLlmResponse;
+    toggleRawLlmBtn.setAttribute('aria-expanded', !isExpanded);
+    toggleRawLlmBtn.textContent = isExpanded ? 'Show' : 'Hide';
 });
 
 const saveBtn = document.getElementById('save-btn');
