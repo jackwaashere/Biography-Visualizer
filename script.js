@@ -94,14 +94,38 @@ async function downloadImage(url, filename) {
     URL.revokeObjectURL(link.href);
 }
 
-function getBase64Image(img) {
-    const canvas = document.createElement("canvas");
-    canvas.width = img.width;
-    canvas.height = img.height;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0);
-    const dataURL = canvas.toDataURL("image/png");
-    return dataURL;
+async function getBase64Image(img) {
+    try {
+        // Fetch the image as a blob to bypass CORS restrictions on canvas
+        const response = await fetch(img.src);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+
+        // Create a new image element and load the blob URL
+        return new Promise((resolve, reject) => {
+            const imageForCanvas = new Image();
+            imageForCanvas.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = imageForCanvas.width;
+                canvas.height = imageForCanvas.height;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(imageForCanvas, 0, 0);
+                const dataURL = canvas.toDataURL("image/png");
+                
+                // Clean up the temporary blob URL
+                URL.revokeObjectURL(url);
+                resolve(dataURL);
+            };
+            imageForCanvas.onerror = (err) => {
+                URL.revokeObjectURL(url);
+                reject(err);
+            };
+            imageForCanvas.src = url;
+        });
+    } catch (error) {
+        console.error('Failed to fetch image for getBase64Image:', error);
+        return Promise.reject(error);
+    }
 }
 
 fetchBtn.addEventListener('click', async () => {
@@ -272,5 +296,88 @@ toggleRawLlmBtn.addEventListener('click', () => {
     } else {
         rawLlmResponseDiv.style.display = 'none';
         toggleRawLlmBtn.textContent = 'Toggle Raw LLM Response';
+    }
+});
+
+const saveBtn = document.getElementById('save-btn');
+const loadBtn = document.getElementById('load-btn');
+const loadInput = document.getElementById('load-input');
+
+saveBtn.addEventListener('click', async () => {
+    const biography_content = biographyText.textContent;
+    const reference_image = subjectImageBase64;
+    const llm_response = JSON.parse(rawLlmResponse);
+    const scenes = {};
+
+    const sceneElements = document.querySelectorAll('.scene');
+    const promises = [];
+
+    for (const sceneElement of sceneElements) {
+        const sceneKey = sceneElement.querySelector('.generate-img-btn').dataset.sceneKey;
+        scenes[sceneKey] = {};
+        const imageElements = sceneElement.querySelectorAll('.thumbnail');
+        const imagePromises = [];
+        for (const imageElement of imageElements) {
+            imagePromises.push(getBase64Image(imageElement));
+        }
+        promises.push(Promise.all(imagePromises).then(images => {
+            scenes[sceneKey].images = images;
+        }));
+    }
+
+    await Promise.all(promises);
+
+    const data = {
+        biography_content,
+        reference_image,
+        llm_response,
+        scenes
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'biography_session.json';
+    a.click();
+    URL.revokeObjectURL(url);
+});
+
+loadBtn.addEventListener('click', () => {
+    loadInput.click();
+});
+
+loadInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const data = JSON.parse(e.target.result);
+            biographyText.textContent = data.biography_content;
+            subjectImageBase64 = data.reference_image;
+            rawLlmResponse = JSON.stringify(data.llm_response, null, 2);
+            displayScenes(data.llm_response.scenes);
+
+            for (const sceneKey in data.scenes) {
+                const sceneElement = document.querySelector(`[data-scene-key="${sceneKey}"]`).closest('.scene');
+                const sceneImagesContainer = sceneElement.querySelector('.scene-images');
+                sceneImagesContainer.innerHTML = '';
+                for (const imageBase64 of data.scenes[sceneKey].images) {
+                    const imageId = `image-${sceneKey}-${Date.now()}`;
+                    const imageContainer = document.createElement('div');
+                    imageContainer.classList.add('scene-image-item');
+                    imageContainer.innerHTML = `
+                        <input type="radio" id="${imageId}" name="scene-image-${sceneKey}" checked>
+                        <label for="${imageId}"><img src="${imageBase64}" class="thumbnail"></label>
+                    `;
+                    sceneImagesContainer.appendChild(imageContainer);
+                }
+            }
+
+            showSections();
+            resultsSection.style.display = 'block';
+        };
+        reader.readAsText(file);
     }
 });

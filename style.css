@@ -13,6 +13,29 @@ header {
     left: 0;
     width: 100%;
     z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+#save-btn, #load-btn {
+    background-color: #4900ff;
+    color: #ffffff;
+    border: none;
+    padding: 10px 15px;
+    font-size: 1em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#save-btn:hover, #load-btn:hover {
+    background-color: #3a00d1;
 }
 
 h1 {
