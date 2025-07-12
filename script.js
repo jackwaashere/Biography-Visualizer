@@ -2,6 +2,7 @@ const fetchBtn = document.getElementById('fetch-btn');
 const urlInput = document.getElementById('url');
 const fileInput = document.getElementById('file');
 const subjectImageInput = document.getElementById('subject-image');
+const subjectImagePreview = document.getElementById('subject-image-preview');
 const contentSection = document.querySelector('.content-section');
 const resultsSection = document.querySelector('.results-section');
 const toggleBtn = document.getElementById('toggle-btn');
@@ -168,8 +169,16 @@ subjectImageInput.addEventListener('change', () => {
         const reader = new FileReader();
         reader.onload = (e) => {
             subjectImageBase64 = e.target.result;
+            subjectImagePreview.src = e.target.result;
+            subjectImagePreview.style.display = 'block';
+            subjectImagePreview.dataset.filename = file.name;
         };
         reader.readAsDataURL(file);
+    } else {
+        subjectImageBase64 = '';
+        subjectImagePreview.src = '';
+        subjectImagePreview.style.display = 'none';
+        subjectImagePreview.removeAttribute('data-filename');
     }
 });
 
@@ -352,6 +361,15 @@ loadInput.addEventListener('change', (e) => {
             const data = JSON.parse(e.target.result);
             biographyText.textContent = data.biography_content;
             subjectImageBase64 = data.reference_image;
+            if (subjectImageBase64) {
+                subjectImagePreview.src = subjectImageBase64;
+                subjectImagePreview.style.display = 'block';
+                subjectImagePreview.dataset.filename = 'loaded_image.png'; // Placeholder filename
+            } else {
+                subjectImagePreview.src = '';
+                subjectImagePreview.style.display = 'none';
+                subjectImagePreview.removeAttribute('data-filename');
+            }
             rawLlmResponse = JSON.stringify(data.llm_response, null, 2);
             displayScenes(data.llm_response.scenes);
 

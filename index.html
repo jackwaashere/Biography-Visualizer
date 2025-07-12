@@ -33,7 +33,10 @@
                 </div>
                  <div class="input-group">
                     <label for="subject-image">Reference Image (Optional)</label>
-                    <input type="file" id="subject-image" accept="image/*">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="subject-image" accept="image/*">
+                        <img id="subject-image-preview" class="image-preview" src="" alt="Image Preview" style="display: none;">
+                    </div>
                 </div>
             </div>
 
