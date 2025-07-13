@@ -10,9 +10,10 @@
     <header>
         <h1>Biography Scene Generator</h1>
         <div class="header-buttons">
-            <button id="save-btn">Save Session</button>
+            <button id="saveSessionBtn">Save Session</button>
             <input type="file" id="load-input" accept=".json" style="display: none;">
             <button id="load-btn">Load Session</button>
+            <button id="generate-storyboard-btn">Generate Storyboard</button>
         </div>
     </header>
 
@@ -82,6 +83,22 @@
             </div>
         </div>
     </main>
+
+    <div id="storyboard-overlay" class="storyboard-overlay">
+        <div class="storyboard-content">
+            <span class="close-storyboard-btn">&times;</span>
+            <div id="storyboard-display">
+                <h2 id="storyboard-title"></h2>
+                <img id="storyboard-image" src="" alt="Storyboard Image">
+                <p id="storyboard-human-text"></p>
+            </div>
+            <div class="storyboard-navigation">
+                <button id="prev-scene-btn">&lt; Previous</button>
+                <span id="scene-counter"></span>
+                <button id="next-scene-btn">Next &gt;</button>
+            </div>
+        </div>
+    </div>
 
     <div id="image-popup" class="popup">
         <div class="popup-content">

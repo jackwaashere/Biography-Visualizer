@@ -18,12 +18,55 @@ const popupImg = document.getElementById('popup-img');
 const closeBtn = document.querySelector('.close-btn');
 const downloadBtn = document.getElementById('download-btn');
 const ghibliStyleCheckbox = document.getElementById('ghibli-style');
+const saveSessionBtn = document.getElementById('saveSessionBtn');
+const generateStoryboardBtn = document.getElementById('generate-storyboard-btn');
+const closeStoryboardBtn = document.querySelector('.close-storyboard-btn');
+const prevSceneBtn = document.getElementById('prev-scene-btn');
+const nextSceneBtn = document.getElementById('next-scene-btn');
+const loadBtn = document.getElementById('load-btn');
+const storyboardOverlay = document.getElementById('storyboard-overlay');
+const storyboardTitle = document.getElementById('storyboard-title');
+const storyboardImage = document.getElementById('storyboard-image');
+const storyboardHumanText = document.getElementById('storyboard-human-text');
+const sceneCounter = document.getElementById('scene-counter');
+const loadInput = document.getElementById('load-input');
 const generationControls = document.getElementById('generation-controls');
 const styleOptions = document.getElementById('style-options');
 const rawLlmSection = document.querySelector('.raw-llm-section');
 
 let rawLlmResponse = '';
 let subjectImageBase64 = '';
+
+let selectedScenes = [];
+let currentSceneIndex = 0;
+
+// Event listener for image selection/deselection
+scenesDiv.addEventListener('change', (e) => {
+    if (e.target.type === 'radio' && e.target.name.startsWith('scene-image-')) {
+        const sceneKey = e.target.dataset.sceneKey;
+        const sceneElement = e.target.closest('.scene');
+        const humanText = sceneElement.querySelector('p').textContent;
+        const title = sceneElement.querySelector('h3').textContent;
+        const imageUrl = e.target.nextElementSibling.querySelector('img').src;
+
+        // Remove existing entry for this sceneKey if it exists
+        selectedScenes = selectedScenes.filter(scene => scene.sceneKey !== sceneKey);
+
+        // Add the newly selected image
+        selectedScenes.push({
+            sceneKey,
+            title,
+            humanText,
+            imageUrl
+        });
+        // Sort selectedScenes by their original order in the DOM
+        selectedScenes.sort((a, b) => {
+            const aIndex = Array.from(scenesDiv.children).indexOf(document.querySelector(`[data-scene-key="${a.sceneKey}"]`).closest('.scene'));
+            const bIndex = Array.from(scenesDiv.children).indexOf(document.querySelector(`[data-scene-key="${b.sceneKey}"]`).closest('.scene'));
+            return aIndex - bIndex;
+        });
+    }
+});
 
 async function generateScenes() {
     const text = biographyText.textContent;
@@ -243,10 +286,23 @@ scenesDiv.addEventListener('click', async (e) => {
             }
 
             imageContainer.innerHTML = `
-                <input type="radio" id="${imageId}" name="scene-image-${sceneKey}" checked>
+                <input type="radio" id="${imageId}" name="scene-image-${sceneKey}" data-scene-key="${sceneKey}" checked>
                 <label for="${imageId}"><img src="${newImageUrl}" class="thumbnail"></label>
             `;
             sceneImagesContainer.appendChild(imageContainer);
+
+            // Add event listener for deselection
+            const newRadio = imageContainer.querySelector(`#${imageId}`);
+            newRadio.addEventListener('click', (event) => {
+                if (newRadio.checked && newRadio.dataset.alreadyChecked) {
+                    newRadio.checked = false;
+                    delete newRadio.dataset.alreadyChecked;
+                    // Remove this scene from selectedScenes if deselected
+                    selectedScenes = selectedScenes.filter(scene => scene.sceneKey !== sceneKey);
+                } else if (newRadio.checked) {
+                    newRadio.dataset.alreadyChecked = 'true';
+                }
+            });
 
         } catch (error) {
             console.error('Error generating image:', error);
@@ -304,11 +360,91 @@ toggleRawLlmBtn.addEventListener('click', () => {
     toggleRawLlmBtn.textContent = isExpanded ? 'Show' : 'Hide';
 });
 
-const saveBtn = document.getElementById('save-btn');
-const loadBtn = document.getElementById('load-btn');
-const loadInput = document.getElementById('load-input');
 
-saveBtn.addEventListener('click', async () => {
+
+// Event listener for image selection/deselection
+scenesDiv.addEventListener('change', (e) => {
+    if (e.target.type === 'radio' && e.target.name.startsWith('scene-image-')) {
+        const sceneKey = e.target.dataset.sceneKey;
+        const sceneElement = e.target.closest('.scene');
+        const humanText = sceneElement.querySelector('p').textContent;
+        const title = sceneElement.querySelector('h3').textContent;
+        const imageUrl = e.target.nextElementSibling.querySelector('img').src;
+
+        // Remove existing entry for this sceneKey if it exists
+        selectedScenes = selectedScenes.filter(scene => scene.sceneKey !== sceneKey);
+
+        // Add the newly selected image
+        selectedScenes.push({
+            sceneKey,
+            title,
+            humanText,
+            imageUrl
+        });
+        // Sort selectedScenes by their original order in the DOM
+        selectedScenes.sort((a, b) => {
+            const aIndex = Array.from(scenesDiv.children).indexOf(document.querySelector(`[data-scene-key="${a.sceneKey}"]`).closest('.scene'));
+            const bIndex = Array.from(scenesDiv.children).indexOf(document.querySelector(`[data-scene-key="${b.sceneKey}"]`).closest('.scene'));
+            return aIndex - bIndex;
+        });
+    }
+});
+
+generateStoryboardBtn.addEventListener('click', () => {
+    // Filter out scenes that don't have a selected image
+    const scenesWithSelectedImages = [];
+    document.querySelectorAll('.scene').forEach(sceneElement => {
+        const selectedRadio = sceneElement.querySelector('input[type="radio"]:checked');
+        if (selectedRadio) {
+            const sceneKey = selectedRadio.dataset.sceneKey;
+            const title = sceneElement.querySelector('h3').textContent;
+            const humanText = sceneElement.querySelector('p').textContent;
+            const imageUrl = selectedRadio.nextElementSibling.querySelector('img').src;
+            scenesWithSelectedImages.push({
+                sceneKey,
+                title,
+                humanText,
+                imageUrl
+            });
+        }
+    });
+
+    selectedScenes = scenesWithSelectedImages;
+
+    if (selectedScenes.length > 0) {
+        currentSceneIndex = 0;
+        displayCurrentStoryboardScene();
+        storyboardOverlay.style.display = 'flex';
+    } else {
+        alert('Please select at least one image to generate a storyboard.');
+    }
+});
+
+closeStoryboardBtn.addEventListener('click', () => {
+    storyboardOverlay.style.display = 'none';
+});
+
+prevSceneBtn.addEventListener('click', () => {
+    currentSceneIndex = (currentSceneIndex - 1 + selectedScenes.length) % selectedScenes.length;
+    displayCurrentStoryboardScene();
+});
+
+nextSceneBtn.addEventListener('click', () => {
+    currentSceneIndex = (currentSceneIndex + 1) % selectedScenes.length;
+    displayCurrentStoryboardScene();
+});
+
+function displayCurrentStoryboardScene() {
+    if (selectedScenes.length > 0) {
+        const currentScene = selectedScenes[currentSceneIndex];
+        storyboardTitle.textContent = currentScene.title;
+        storyboardImage.src = currentScene.imageUrl;
+        storyboardHumanText.textContent = currentScene.humanText;
+        sceneCounter.textContent = `${currentSceneIndex + 1} / ${selectedScenes.length}`;
+    }
+}
+
+saveSessionBtn.addEventListener('click', async () => {
     const biography_content = biographyText.textContent;
     const reference_image = subjectImageBase64;
     const llm_response = JSON.parse(rawLlmResponse);
@@ -322,11 +458,17 @@ saveBtn.addEventListener('click', async () => {
         scenes[sceneKey] = {};
         const imageElements = sceneElement.querySelectorAll('.thumbnail');
         const imagePromises = [];
+        let selectedImage = null;
         for (const imageElement of imageElements) {
+            const radioInput = imageElement.closest('label').previousElementSibling;
+            if (radioInput && radioInput.checked) {
+                selectedImage = await getBase64Image(imageElement);
+            }
             imagePromises.push(getBase64Image(imageElement));
         }
         promises.push(Promise.all(imagePromises).then(images => {
             scenes[sceneKey].images = images;
+            scenes[sceneKey].selectedImage = selectedImage; // Store selected image
         }));
     }
 
@@ -378,14 +520,28 @@ loadInput.addEventListener('change', (e) => {
                 const sceneImagesContainer = sceneElement.querySelector('.scene-images');
                 sceneImagesContainer.innerHTML = '';
                 for (const imageBase64 of data.scenes[sceneKey].images) {
-                    const imageId = `image-${sceneKey}-${Date.now()}`;
+                    const imageId = `image-${sceneKey.replace(/\s+/g, '-')}-${Date.now()}`;
+
                     const imageContainer = document.createElement('div');
                     imageContainer.classList.add('scene-image-item');
                     imageContainer.innerHTML = `
-                        <input type="radio" id="${imageId}" name="scene-image-${sceneKey}" checked>
+                        <input type="radio" id="${imageId}" name="scene-image-${sceneKey}" data-scene-key="${sceneKey}" ${imageBase64 === data.scenes[sceneKey].selectedImage ? 'checked' : ''}>
                         <label for="${imageId}"><img src="${imageBase64}" class="thumbnail"></label>
                     `;
                     sceneImagesContainer.appendChild(imageContainer);
+
+                    // Add event listener for deselection on loaded images
+                    const loadedRadio = imageContainer.querySelector(`#${imageId}`);
+                    loadedRadio.addEventListener('click', (event) => {
+                        if (loadedRadio.checked && loadedRadio.dataset.alreadyChecked) {
+                            loadedRadio.checked = false;
+                            delete loadedRadio.dataset.alreadyChecked;
+                            // Remove this scene from selectedScenes if deselected
+                            selectedScenes = selectedScenes.filter(scene => scene.sceneKey !== sceneKey);
+                        } else if (loadedRadio.checked) {
+                            loadedRadio.dataset.alreadyChecked = 'true';
+                        }
+                    });
                 }
             }
 
