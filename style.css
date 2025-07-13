@@ -123,7 +123,7 @@ input[type="file"] {
     cursor: pointer;
 }
 
-#fetch-btn, #generate-scenes-btn, #save-btn, #load-btn, .generate-img-btn {
+#fetch-btn, #generate-scenes-btn, #save-btn, #load-btn, .generate-img-btn, #saveSessionBtn, #generate-storyboard-btn {
     background-color: var(--primary-color);
     color: var(--button-text-color);
     border: none;
@@ -135,13 +135,17 @@ input[type="file"] {
     transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-#fetch-btn:hover, #generate-scenes-btn:hover, #save-btn:hover, #load-btn:hover, .generate-img-btn:hover {
+#fetch-btn:hover, #generate-scenes-btn:hover, #save-btn:hover, #load-btn:hover, .generate-img-btn:hover, #saveSessionBtn:hover, #generate-storyboard-btn:hover {
     background-color: var(--primary-hover-color);
     box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
 }
 
-#generate-scenes-btn, #fetch-btn {
-    width: 100%;
+#generate-scenes-btn, #generate-storyboard-btn {
+    background-color: #28a745;
+}
+
+#generate-scenes-btn:hover, #generate-storyboard-btn:hover {
+    background-color: #218838;
 }
 
 #generate-scenes-btn.generating, .generate-img-btn.generating {
