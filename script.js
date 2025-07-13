@@ -561,51 +561,8 @@ loadInput.addEventListener('change', (e) => {
 
 openStoryboardTabBtn.addEventListener('click', () => {
     if (generateStoryboard()) {
-        const storyboardWindow = window.open('', '_blank');
-        const newDocument = storyboardWindow.document;
-        newDocument.write('<html><head><title>Storyboard</title>');
-        const stylesheet = document.querySelector('link[rel="stylesheet"]');
-        if (stylesheet) {
-            newDocument.write(stylesheet.outerHTML);
-        }
-        newDocument.write('</head><body>');
-        newDocument.write(storyboardOverlay.innerHTML);
-        newDocument.write(`<script>
-            let selectedScenes = ${JSON.stringify(selectedScenes)};
-            let currentSceneIndex = ${currentSceneIndex};
-            const storyboardTitle = document.getElementById('storyboard-title');
-            const storyboardImage = document.getElementById('storyboard-image');
-            const storyboardHumanText = document.getElementById('storyboard-human-text');
-            const sceneCounter = document.getElementById('scene-counter');
-            const prevSceneBtn = document.getElementById('prev-scene-btn');
-            const nextSceneBtn = document.getElementById('next-scene-btn');
-
-            function displayCurrentStoryboardScene() {
-                if (selectedScenes.length > 0) {
-                    const currentScene = selectedScenes[currentSceneIndex];
-                    storyboardTitle.textContent = currentScene.title;
-                    storyboardImage.src = currentScene.imageUrl;
-                    storyboardHumanText.textContent = currentScene.humanText;
-                    sceneCounter.textContent = ${`${currentSceneIndex + 1} / ${selectedScenes.length}`};
-                }
-            }
-
-            prevSceneBtn.addEventListener('click', () => {
-                currentSceneIndex = (currentSceneIndex - 1 + selectedScenes.length) % selectedScenes.length;
-                displayCurrentStoryboardScene();
-            });
-
-            nextSceneBtn.addEventListener('click', () => {
-                currentSceneIndex = (currentSceneIndex + 1) % selectedScenes.length;
-                displayCurrentStoryboardScene();
-            });
-
-            const storyboardOverlayInNewTab = document.getElementById('storyboard-overlay');
-            if(storyboardOverlayInNewTab) {
-                storyboardOverlayInNewTab.style.display = 'flex';
-            }
-        </script>`);
-        newDocument.write('</body></html>');
-        newDocument.close();
+        localStorage.setItem('storyboardSelectedScenes', JSON.stringify(selectedScenes));
+        localStorage.setItem('storyboardCurrentSceneIndex', currentSceneIndex);
+        window.open('storyboard.html', '_blank');
     }
 });
