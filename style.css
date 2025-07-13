@@ -123,8 +123,7 @@ input[type="file"] {
     cursor: pointer;
 }
 
-#fetch-btn, #generate-scenes-btn, #save-btn, #load-btn, .generate-img-btn, #saveSessionBtn, #generate-storyboard-btn, #open-storyboard-tab-btn {
-    background-color: var(--primary-color);
+.btn-base {
     color: var(--button-text-color);
     border: none;
     padding: 10px 16px;
@@ -135,16 +134,23 @@ input[type="file"] {
     transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-#fetch-btn:hover, #generate-scenes-btn:hover, #save-btn:hover, #load-btn:hover, .generate-img-btn:hover, #saveSessionBtn:hover, #generate-storyboard-btn:hover, #open-storyboard-tab-btn:hover {
-    background-color: var(--primary-hover-color);
+.btn-base:hover {
     box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
 }
 
-#generate-scenes-btn, #generate-storyboard-btn {
+.btn-primary {
+    background-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover-color);
+}
+
+.btn-green {
     background-color: #28a745;
 }
 
-#generate-scenes-btn:hover, #generate-storyboard-btn:hover {
+.btn-green:hover {
     background-color: #218838;
 }
 
@@ -481,4 +487,12 @@ header {
     font-size: 1.1em;
     font-weight: 500;
     color: var(--text-color);
+}
+
+#open-storyboard-tab-btn {
+    background-color: #28a745;
+}
+
+#open-storyboard-tab-btn:hover {
+    background-color: #218838;
 }

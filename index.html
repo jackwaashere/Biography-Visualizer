@@ -10,9 +10,9 @@
     <header>
         <h1>Biography Scene Generator</h1>
         <div class="header-buttons">
-            <button id="saveSessionBtn">Save Session</button>
+            <button id="saveSessionBtn" class="btn-base btn-primary">Save Session</button>
             <input type="file" id="load-input" accept=".json" style="display: none;">
-            <button id="load-btn">Load Session</button>
+            <button id="load-btn" class="btn-base btn-primary">Load Session</button>
         </div>
     </header>
 
@@ -24,7 +24,7 @@
                     <label for="url">Fetch from URL</label>
                     <div class="url-input">
                         <input type="text" id="url" placeholder="Enter a public URL">
-                        <button id="fetch-btn">Fetch</button>
+                        <button id="fetch-btn" class="btn-base btn-primary">Fetch</button>
                     </div>
                 </div>
                 <div class="input-group">
@@ -42,7 +42,7 @@
 
             <div class="panel-section" id="generation-controls" style="display: none;">
                 <h2>2. Generate Scenes</h2>
-                <button id="generate-scenes-btn">Generate Scene Ideas</button>
+                <button id="generate-scenes-btn" class="btn-base btn-green">Generate Scene Ideas</button>
             </div>
             
             <div class="panel-section" id="style-options" style="display: none;">
@@ -58,9 +58,9 @@
             <div class="panel-section content-section" style="display: none;">
                 <div class="panel-header">
                     <h2>Biography Text</h2>
-                    <button id="toggle-btn" class="toggle-visibility-btn" aria-expanded="true">Hide</button>
+                    <button id="toggle-btn" class="toggle-visibility-btn" aria-expanded="false">Show</button>
                 </div>
-                <div id="content" class="collapsible show">
+                <div id="content" class="collapsible">
                     <pre id="biography-text"></pre>
                 </div>
             </div>
@@ -71,8 +71,8 @@
                     <button id="toggle-scenes-btn" class="toggle-visibility-btn" aria-expanded="true">Hide</button>
                 </div>
                 <div id="scenes" class="collapsible show"></div>
-                <button id="generate-storyboard-btn">Generate Storyboard</button>
-                <button id="open-storyboard-tab-btn">Open Storyboard in New Tab</button>
+                <button id="generate-storyboard-btn" class="btn-base btn-green">Generate Storyboard</button>
+                <button id="open-storyboard-tab-btn" class="btn-base btn-green" style="background-color: #28a745;">Open Storyboard in New Tab</button>
             </div>
 
             <div class="panel-section raw-llm-section" style="display: none;">

@@ -114,7 +114,7 @@ function displayScenes(scenes) {
             <div class="scene-content">
                 <h3>${scene.title}</h3>
                 <p>${scene.human_text}</p>
-                <button class="generate-img-btn" data-scene-key="${sceneKey}">Generate Image</button>
+                <button class="generate-img-btn btn-base btn-green" data-scene-key="${sceneKey}">Generate Image</button>
             </div>
             <div class="scene-images"></div>
         `;
@@ -509,6 +509,9 @@ loadInput.addEventListener('change', (e) => {
         reader.onload = (e) => {
             const data = JSON.parse(e.target.result);
             biographyText.textContent = data.biography_content;
+            contentDiv.classList.remove('show');
+            toggleBtn.setAttribute('aria-expanded', 'false');
+            toggleBtn.textContent = 'Show';
             subjectImageBase64 = data.reference_image;
             if (subjectImageBase64) {
                 subjectImagePreview.src = subjectImageBase64;
