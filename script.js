@@ -15,6 +15,12 @@ const toggleRawLlmBtn = document.getElementById('toggle-raw-llm-btn');
 const rawLlmResponseDiv = document.getElementById('raw-llm-response');
 const imagePopup = document.getElementById('image-popup');
 const popupImg = document.getElementById('popup-img');
+const popupVideo = document.getElementById('popup-video');
+const progressBarContainer = document.querySelector('.progress-bar-container');
+const progressBar = document.querySelector('.progress-bar');
+const generateVideoBtn = document.getElementById('generate-video-btn');
+const playVideoBtn = document.getElementById('play-video-btn');
+const downloadVideoBtn = document.getElementById('download-video-btn');
 const closeBtn = document.querySelector('.close-btn');
 const downloadBtn = document.getElementById('download-btn');
 const ghibliStyleCheckbox = document.getElementById('ghibli-style');
@@ -132,11 +138,21 @@ function showSections() {
 
 function closePopup() {
     imagePopup.style.display = 'none';
+    popupVideo.pause();
 }
 
 async function downloadImage(url, filename) {
     const response = await fetch(url);
     const blob = await response.blob();
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(link.href);
+}
+
+async function downloadVideo(base64, filename) {
+    const blob = await (await fetch(base64)).blob();
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = filename;
@@ -316,13 +332,29 @@ scenesDiv.addEventListener('click', async (e) => {
 
     if (e.target.classList.contains('thumbnail')) {
         const sceneElement = e.target.closest('.scene');
+        const sceneKey = sceneElement.querySelector('.generate-img-btn').dataset.sceneKey;
         const sceneNumber = sceneElement.dataset.sceneNumber;
         const sceneTitle = sceneElement.dataset.sceneTitle;
-        const filename = `scene${sceneNumber}-${sceneTitle.replace(/\s+/g, '-').toLowerCase()}.png`;
 
         popupImg.src = e.target.src;
+        popupImg.style.display = 'block';
+        popupVideo.style.display = 'none';
+        popupVideo.src = '';
+
         downloadBtn.onclick = () => downloadImage(popupImg.src, `scene${sceneNumber}-${sceneTitle.replace(/\s+/g, '-').toLowerCase()}.png`);
+        
+        imagePopup.dataset.sceneKey = sceneKey;
         imagePopup.style.display = 'flex';
+
+        playVideoBtn.disabled = true;
+        downloadVideoBtn.disabled = true;
+        generateVideoBtn.disabled = false;
+
+        const sceneData = JSON.parse(rawLlmResponse).scenes[sceneKey];
+        if (sceneData.video_base64) {
+            playVideoBtn.disabled = false;
+            downloadVideoBtn.disabled = false;
+        }
     }
 });
 
@@ -473,6 +505,11 @@ saveSessionBtn.addEventListener('click', async () => {
             }
             imagePromises.push(getBase64Image(imageElement));
         }
+        const sceneData = JSON.parse(rawLlmResponse).scenes[sceneKey];
+        if (sceneData.video_base64) {
+            scenes[sceneKey].video_base64 = sceneData.video_base64;
+        }
+
         promises.push(Promise.all(imagePromises).then(images => {
             scenes[sceneKey].images = images;
             scenes[sceneKey].selectedImage = selectedImage; // Store selected image
@@ -553,6 +590,11 @@ loadInput.addEventListener('change', (e) => {
                         }
                     });
                 }
+                if (data.scenes[sceneKey].video_base64) {
+                    const sceneData = JSON.parse(rawLlmResponse).scenes[sceneKey];
+                    sceneData.video_base64 = data.scenes[sceneKey].video_base64;
+                    rawLlmResponse = JSON.stringify(JSON.parse(rawLlmResponse), null, 2);
+                }
             }
 
             showSections();
@@ -568,4 +610,75 @@ openStoryboardTabBtn.addEventListener('click', () => {
         localStorage.setItem('storyboardCurrentSceneIndex', currentSceneIndex);
         window.open('storyboard.html', '_blank');
     }
+});
+
+generateVideoBtn.addEventListener('click', async () => {
+    const sceneKey = imagePopup.dataset.sceneKey;
+    const scenesData = JSON.parse(rawLlmResponse);
+    const videoPrompt = scenesData.scenes[sceneKey].video_prompt;
+    const imageUrl = popupImg.src;
+
+    generateVideoBtn.disabled = true;
+    progressBarContainer.style.display = 'block';
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += 1;
+        progressBar.style.width = `${progress}%`;
+        if (progress >= 100) {
+            clearInterval(interval);
+        }
+    }, 600);
+
+    try {
+        const response = await fetch('/generate-video', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                prompt: videoPrompt,
+                image_url: imageUrl,
+            })
+        });
+        const data = await response.json();
+        const videoUrl = data.video.url;
+
+        const videoResponse = await fetch(videoUrl);
+        const videoBlob = await videoResponse.blob();
+        const reader = new FileReader();
+        reader.readAsDataURL(videoBlob);
+        reader.onloadend = () => {
+            const base64data = reader.result;
+            scenesData.scenes[sceneKey].video_base64 = base64data;
+            rawLlmResponse = JSON.stringify(scenesData, null, 2);
+
+            popupVideo.src = base64data;
+            playVideoBtn.disabled = false;
+            downloadVideoBtn.disabled = false;
+            progressBarContainer.style.display = 'none';
+            progressBar.style.width = '0%';
+        };
+    } catch (error) {
+        console.error('Error generating video:', error);
+        clearInterval(interval);
+        progressBarContainer.style.display = 'none';
+        progressBar.style.width = '0%';
+        generateVideoBtn.disabled = false;
+    }
+});
+
+playVideoBtn.addEventListener('click', () => {
+    popupImg.style.display = 'none';
+    popupVideo.style.display = 'block';
+    popupVideo.play();
+});
+
+downloadVideoBtn.addEventListener('click', () => {
+    const sceneKey = imagePopup.dataset.sceneKey;
+    const sceneData = JSON.parse(rawLlmResponse).scenes[sceneKey];
+    const sceneElement = document.querySelector(`[data-scene-key="${sceneKey}"]`).closest('.scene');
+    const sceneNumber = sceneElement.dataset.sceneNumber;
+    const sceneTitle = sceneElement.dataset.sceneTitle;
+    const filename = `scene${sceneNumber}-${sceneTitle.replace(/\s+/g, '-').toLowerCase()}.mp4`;
+    downloadVideo(sceneData.video_base64, filename);
 });

@@ -117,6 +117,33 @@ app.post('/generate-image', async (req, res) => {
     }
 });
 
+app.post('/generate-video', async (req, res) => {
+    const { prompt, image_url } = req.body;
+
+    console.log('--- Fal.ai Video Generation Request ---');
+    console.log('Prompt:', prompt);
+    console.log('Image URL (first 50 chars):', image_url.substring(0, 50) + '...');
+    console.log('------------------------------------');
+
+    try {
+        const result = await fal.subscribe('fal-ai/kling-video/v2.1/standard/image-to-video', {
+            input: {
+                prompt,
+                image_url,
+                video_duration: '5_seconds'
+            },
+            logs: true,
+            onQueueUpdate: (update) => {
+                console.log('queue update', update);
+            },
+        });
+        res.json({ video: result.video });
+    } catch (error) {
+        console.error('Error generating video:', error);
+        res.status(500).json({ error: 'Error generating video' });
+    }
+});
+
 app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);
 });

@@ -295,22 +295,55 @@ input[type="file"] {
     border-radius: 8px;
 }
 
-#download-btn {
-    display: inline-block;
+#popup-video {
+    max-width: 100%;
+    max-height: calc(80vh - 100px);
+    border-radius: 8px;
+}
+
+.popup-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
     margin-top: 20px;
+}
+
+.popup-buttons button {
     background-color: var(--primary-color);
     color: var(--button-text-color);
-    padding: 12px 24px;
+    padding: 10px 16px;
     text-decoration: none;
     border-radius: 8px;
     transition: background-color 0.2s;
     border: none;
-    font-size: 1em;
+    font-size: 0.9em;
     cursor: pointer;
 }
 
-#download-btn:hover {
+.popup-buttons button:hover {
     background-color: var(--primary-hover-color);
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.progress-bar-container {
+    width: 100%;
+    background-color: #f3f3f3;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 20px;
+    background-color: #4caf50;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 20px;
+    color: white;
 }
 
 header {

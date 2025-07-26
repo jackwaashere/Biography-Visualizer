@@ -105,7 +105,16 @@
         <div class="popup-content">
             <span class="close-btn">&times;</span>
             <img src="" alt="Generated Image" id="popup-img">
-            <button id="download-btn">Download Image</button>
+            <video id="popup-video" style="display: none;" controls></video>
+            <div class="progress-bar-container" style="display: none;">
+                <div class="progress-bar"></div>
+            </div>
+            <div class="popup-buttons">
+                <button id="download-btn">Download Image</button>
+                <button id="generate-video-btn">Generate Video</button>
+                <button id="play-video-btn" disabled>Play Video</button>
+                <button id="download-video-btn" disabled>Download Video</button>
+            </div>
         </div>
     </div>
 
