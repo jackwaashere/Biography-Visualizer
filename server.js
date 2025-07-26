@@ -100,6 +100,7 @@ app.post('/generate-image', async (req, res) => {
     console.log('------------------------------------');
 
     try {
+        let queueUpdateCount = 0;
         const result = await fal.subscribe('fal-ai/flux-pro/kontext', {
             input: {
                 prompt,
@@ -107,7 +108,10 @@ app.post('/generate-image', async (req, res) => {
             },
             logs: true,
             onQueueUpdate: (update) => {
-                console.log('queue update', update);
+                queueUpdateCount++;
+                if (queueUpdateCount % 10 === 0) {
+                    console.log('queue update', update);
+                }
             },
         });
         res.json({ imageUrl: result.images[0].url });
@@ -126,6 +130,7 @@ app.post('/generate-video', async (req, res) => {
     console.log('------------------------------------');
 
     try {
+        let queueUpdateCount = 0;
         const result = await fal.subscribe('fal-ai/kling-video/v2.1/standard/image-to-video', {
             input: {
                 prompt,
@@ -134,7 +139,10 @@ app.post('/generate-video', async (req, res) => {
             },
             logs: true,
             onQueueUpdate: (update) => {
-                console.log('queue update', update);
+                queueUpdateCount++;
+                if (queueUpdateCount % 10 === 0) {
+                    console.log('queue update', update);
+                }
             },
         });
         res.json({ video: result.video });

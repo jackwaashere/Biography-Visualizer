@@ -668,6 +668,9 @@ generateVideoBtn.addEventListener('click', async () => {
 });
 
 playVideoBtn.addEventListener('click', () => {
+    const sceneKey = imagePopup.dataset.sceneKey;
+    const sceneData = JSON.parse(rawLlmResponse).scenes[sceneKey];
+    popupVideo.src = sceneData.video_base64;
     popupImg.style.display = 'none';
     popupVideo.style.display = 'block';
     popupVideo.play();
