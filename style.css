@@ -476,7 +476,7 @@ header {
     color: var(--text-color);
 }
 
-#storyboard-image {
+#storyboard-image, #storyboard-video {
     max-width: 100%;
     height: auto;
     max-height: 60vh;

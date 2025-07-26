@@ -40,6 +40,7 @@ const generationControls = document.getElementById('generation-controls');
 const styleOptions = document.getElementById('style-options');
 const openStoryboardTabBtn = document.getElementById('open-storyboard-tab-btn');
 const rawLlmSection = document.querySelector('.raw-llm-section');
+const storyboardVideo = document.getElementById('storyboard-video');
 
 let rawLlmResponse = '';
 let subjectImageBase64 = '';
@@ -432,11 +433,15 @@ function generateStoryboard() {
             const title = sceneElement.querySelector('h3').textContent;
             const humanText = sceneElement.querySelector('p').textContent;
             const imageUrl = selectedRadio.nextElementSibling.querySelector('img').src;
+            const sceneData = JSON.parse(rawLlmResponse).scenes[sceneKey];
+            const video_base64 = sceneData.video_base64 || null;
+
             scenesWithSelectedImages.push({
                 sceneKey,
                 title,
                 humanText,
-                imageUrl
+                imageUrl,
+                video_base64
             });
         }
     });
@@ -477,9 +482,20 @@ function displayCurrentStoryboardScene() {
     if (selectedScenes.length > 0) {
         const currentScene = selectedScenes[currentSceneIndex];
         storyboardTitle.textContent = currentScene.title;
-        storyboardImage.src = currentScene.imageUrl;
         storyboardHumanText.textContent = currentScene.humanText;
         sceneCounter.textContent = `${currentSceneIndex + 1} / ${selectedScenes.length}`;
+
+        if (currentScene.video_base64) {
+            storyboardImage.style.display = 'none';
+            storyboardVideo.style.display = 'block';
+            storyboardVideo.src = currentScene.video_base64;
+            storyboardVideo.play();
+        } else {
+            storyboardVideo.style.display = 'none';
+            storyboardImage.style.display = 'block';
+            storyboardImage.src = currentScene.imageUrl;
+            storyboardVideo.pause();
+        }
     }
 }
 
@@ -604,13 +620,37 @@ loadInput.addEventListener('change', (e) => {
     }
 });
 
-openStoryboardTabBtn.addEventListener('click', () => {
+openStoryboardTabBtn.addEventListener('click', async () => {
     if (generateStoryboard()) {
-        localStorage.setItem('storyboardSelectedScenes', JSON.stringify(selectedScenes));
-        localStorage.setItem('storyboardCurrentSceneIndex', currentSceneIndex);
+        await saveStoryboardToDB(selectedScenes, currentSceneIndex);
         window.open('storyboard.html', '_blank');
     }
 });
+
+async function saveStoryboardToDB(scenes, index) {
+    const db = await openDB();
+    const tx = db.transaction('storyboard', 'readwrite');
+    const store = tx.objectStore('storyboard');
+    await store.put({ id: 'scenes', data: scenes });
+    await store.put({ id: 'index', data: index });
+    await tx.done;
+}
+
+function openDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('storyboardDB', 1);
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            db.createObjectStore('storyboard', { keyPath: 'id' });
+        };
+        request.onsuccess = (event) => {
+            resolve(event.target.result);
+        };
+        request.onerror = (event) => {
+            reject(event.target.error);
+        };
+    });
+}
 
 generateVideoBtn.addEventListener('click', async () => {
     const sceneKey = imagePopup.dataset.sceneKey;
