@@ -8,10 +8,11 @@ This is a web application that allows users to input a biography, generate scene
 *   **Reference Image:** Optionally upload a reference image to influence image generation.
 *   **Scene Generation:** Utilizes the Google Gemini API to analyze the biography and suggest distinct scenes, complete with human-friendly descriptions, image prompts, and video prompts.
 *   **Image Generation:** Integrates with Fal.ai's Flux Pro model to generate images based on the generated scene prompts.
+*   **Video Generation:** Integrates with Fal.ai's Kling v2.1 model to generate videos based on selected images and video prompts.
 *   **Ghibli Style:** Option to generate images in a Ghibli-inspired art style.
-*   **Session Management:** Save and load the current session, including biography text, reference image, generated scenes, and images.
+*   **Session Management:** Save and load the current session, including biography text, reference image, generated scenes, images, and videos (using IndexedDB for larger data).
 *   **Raw LLM Response:** View the raw JSON response from the Gemini API for debugging or detailed analysis.
-*   **Image Download:** Download generated images directly from the application.
+*   **Image/Video Download:** Download generated images and videos directly from the application.
 
 ## Code Structure
 

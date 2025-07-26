@@ -9,10 +9,11 @@ The Biography Scene Generator is a web-based application designed to help users 
 *   Optionally provide a reference image for character consistency.
 *   Generate scene ideas from the biography using an LLM.
 *   Generate multiple image options for each scene.
+*   Generate videos based on selected images and text prompts.
 *   Apply a "Ghibli style" to generated images.
-*   Select preferred images for each scene to build a cohesive storyboard.
-*   View the complete storyboard in an interactive overlay or a new browser tab.
-*   Save and load your entire session, including biography, LLM responses, and selected images.
+*   Select preferred images/videos for each scene to build a cohesive storyboard.
+*   View the complete storyboard in an interactive overlay or a new browser tab, with video playback.
+*   Save and load your entire session, including biography, LLM responses, and selected images/videos.
 *   Inspect the raw LLM response for detailed insights.
 
 ## 2. Getting Started
