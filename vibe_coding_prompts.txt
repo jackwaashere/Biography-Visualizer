@@ -1,0 +1,272 @@
+Make a web application that makes images and videos for scenes in a biography.
+
+The webpage allows the user to fetch the biography webpage. Alternatively, the user can upload a text file of the biography.
+
+After biography text is input, the program will call a LLM to generate ideas for AI image generation prompts, describing image scenes that could potentially be incorporated into the biography. I will provide the LLM code snippet and system prompt later. For now, if the user provides a url, the app fetches content from the webpage and parses the HTML to get the text content. For now, just display the fetched content on the webpage, or the text from the file that the user uploaded. The main webpage should allow the user to collapse or hide the content. By default, it's collapsed, and the user must explicitly click "Toggle to Display the Text Content".
+
+===
+
+After the web app receives text content, call Gemini API (Gemini 2.5 Flash) to get some scene ideas. The LLM request should include content of the biography text content uploaded or fetched from the previous step. After the LLM call, the web app shows the result, collapsed, hidden by default, and requires the user to click a toggle button in order to show the result.
+
+Below is the system prompt I would like to use:
+
+Read the biography below, create a few scene ideas to generate images for some events in his biography.
+
+The scenes should have two parts.
+(1) human friendly text to describe the image.
+(2) concise prompt for an image model like Flux to generate high quality image
+(3) concise prompt for a video model like Kling to generate high quality short 5s video
+
+The image prompt should not contain the name of the person. The human friendly text may contain the name of the person.
+
+The response is in JSON format. Example:
+{
+  "scene 1": {
+    "title": "Early Career Hustle: Stand-Up and Sales",
+    "human_text": "Jimmy O. Yang navigates the early days of his career, balancing the grind of performing stand-up comedy with the practical necessity of earning a living, perhaps by selling pre-owned vehicles. This scene captures his determination and resourcefulness as he builds his foundation in entertainment.",
+    "prompt": "A young adult man, dressed in a sharp but slightly worn suit, stands in front of a neon-lit 'Used Cars' sign. He holds a microphone in one hand and gestures as if delivering a punchline, blending the worlds of a comedian and a salesman. Urban night setting, gritty realism, detailed.",
+    "video_prompt": "A young adult man, dressed sharply, transitions smoothly from passionately performing stand-up comedy on a small, dimly lit stage, gesturing emphatically with a microphone, to then standing confidently beside a used car, gesturing towards it as if making a sales pitch. Both scenes are quick cuts, showing his dual life."
+  },
+}
+
+===
+
+Hide the "Toggle to Display the Text Content" and "Toggle to Display Scene Ideas" buttons until a file has been uploaded   │
+│    or a URL has been fetched. Replace the text in "Toggle to Display the Text Content" with "Toggle to Display Text Content". │
+│     Replace the Display Scene Ideas button with a button that lets the user confirm the LLM API call, so that the LLM call    │
+│    does not happen until the user clicks this button. After the user clicks this button, replace it with text that says       │
+│    "Generating..." until the LLM returns the json file and it is ready to be read, then bring back the "Toggle to Display     │
+│    Scene Ideas" button                                                                                                        
+
+===
+
+Turn the title "Biography Scene Generator" into a header that stays on the screen as you scroll. Make the header background the same color as the boxes that contain the buttons and the Enter Biography.
+
+Initially only show the box labeled "Enter Biography", hide all other grey boxes and their contents. Once text from a URL is fetched or a text file is uploaded, show the boxes for "Toggle to Display Text Content" and "Generate Ideas". All boxes should be spaced 20 pixels apart. When the "Generate Ideas" button is clicked, it turns into a dark grey button that cannot be pressed that says "Generating..." before turning back into a clickable button the same color as all others that says "Toggle to Display Scene Ideas", which works exactly as the "Toggle to Display Scene Ideas" button currently does. 
+
+Add a "Toggle Raw LLM Response" button below "Toggle to Display Scene Ideas" after the LLM responds, and show the Raw LLM Response when the button is clicked, and hide it if clicked again.
+
+===
+
+Can you please change the UI so that instead of turning the "Generating..." unclickable button into the "Toggle to Display Scene Ideas" button, turn it back into the "Generate Ideas" button and create the "Toggle to Display Scene Ideas" button in a box below the box containing the "Generate Ideas" button.
+
+===
+
+Hide image prompt and video prompt from the Scene Ideas so that it only shows labels and Human-friendly text.
+Also replace all text that says "Generate Ideas" with "Generate Scene Ideas"
+
+===
+
+To the left of each mini box description under Scene Ideas, show a button associated with each scene, named "Generate Image". It calls Fal.ai API on the flux-pro/kontext model. Here's the document of this API. https://fal.ai/models/fal-ai/flux-pro/kontext/api
+
+I am going to call the fal.io kontext model with the prompt from each scene. The API also accepts a reference image in base64 form. Let's add a new image file upload in our main webpage, call it field "subject of the biography". After the user uploads a reference image, we can use this image as parameter in the fal.io model request.
+
+After getting the Fal.io image generation response, let's show a thumbnail of the image in the scene table. The thumbnail is clickable. Once clicked, it shows a pop up dialog to show the big picture. The user can close the pop up dialog. The user can download the image.
+
+===
+
+│  > I have already set a "FAL_API_KEY" in .env.local, but I get this     │
+│    error while trying to generate an image using "Generate Image"       │
+│    button.                                                              │
+│                                                                         │
+│    Using default configuration for the fal client                       │
+│    Error generating image: ApiError: Unauthorized                       │
+│        at /Users/tongjack/Documents/biography_gui_project_1/node_module │
+│    s/@fal-ai/serverless-client/src/response.js:56:23                    │
+│        at Generator.next (<anonymous>)                                  │
+│        at fulfilled (/Users/tongjack/Documents/biography_gui_project_1/ │
+│    node_modules/@fal-ai/serverless-client/src/response.js:5:58)         │
+│        at process.processTicksAndRejections                             │
+│    (node:internal/process/task_queues:105:5) {                          │
+│      status: 401,                                                       │
+│      body: {                                                            │
+│        detail: "Cannot access application 'fal-ai/flux-pro'.            │
+│    Authentication is required to access this application."              │
+│      }                                                                  │
+│    }              
+
+===
+
+When I click into the generated image, the image pops up on the screen magnified, but I am unable to close the popup because my browser aspect ratio is very long, making the "X" that closes the image displace itself off the screen. Please change the UI so that the "X" to close the image is in the white space so it is distinct from the image, make sure that the image does not run off the screen, and make it possible to close out of the image preview if the user clicks at the background or clicks the escape key.
+
+===
+
+When I click "Download Image", the webpage redirects me to the image link instead of downloading the image into my files. Make the download button keep the user on the same page. When the file is downloaded, start the file name with "scene#-" where # is replaced with the scene number, then name next part after the title the LLM generated for the scene.
+Also, for the button that closes the image preview, make the "X" symbol centered on the circle.
+
+===
+
+Let's allow the "Generate Image" button to generate more than one images. If an image is already generated, the new image will be added to the image list, next to the previous image. Since we now support multiple generated images, I want to add a single choice option button along with the images. Where there are multiple images per scene, only one image will be selected per scene. By default, the last generated image is selected.
+
+===
+
+Let's allow the "Generate Image" button to generate more than one images. If an image is already generated, the new image will be added to the image list, next to the previous image. Since we now support multiple generated images, I want to add a single choice option button along with the images. Where there are multiple images per scene, only one image will be selected per scene. By default, the last generated image is selected.
+
+===
+
+Each time a request for an image generation is made, can you output the details about the FAL.ai request to server console? This should include the image generation prompt.
+
+===
+
+I looked at the server logs and when I generated an image, it said that the prompt was "This scene depicts Jimmy O. Yang's return to his hometown in Hong Kong, emphasizing the emotional connection he rekindles with his heritage."
+This is the exact same as the text description under the "Scene Ideas" category intended as human-friendly text. I want the prompt for image generation to instead come from the "prompt" key from the corresponding scene from the Raw LLM Response, not the "human_text" key as it is right now.
+
+===
+
+There is an issue right now with generating more images: it does not let me click "Generate Image" again for the same scene.
+
+===
+
+I am able to generate multiple images in the same scene now, which is good. However, when I check the box for "Ghibili Style", I am no longer able to generate images in the same scene. When Ghibili Style is on, the server should check which image is selected. If no images have been generated yet for this prompt, or if the previously generated image is already Ghibili style, then an image should be generated with the exact same prompt that would have been used if Ghibili Style was off, except with "strong ghibili style" appended to the prompt. If the selected previously generated image is not Ghibili style, the generated image should use the selected previously generated image as a reference image (in base64) and just use the prompt "ghibili style".
+
+===
+
+I am still unable to generate images in Ghibli style if non Ghibli style images are already generated. Make it so that if Ghibli style is on and the selected image in the scene is not ghibli style, the same selected image gets used as a reference image (in base64), and the prompt is "ghibli style".
+Also I made a mistake and said "Ghibili" in the previous prompt. Replace all instances of "Ghibili" with "Ghibli"
+
+===
+
+Let's add Save and Load feature for this app.
+
+Let's add a "Save" and "Load" buttons to the header at the top of the page
+
+The save button allows the user to save the current session to a local file, in the form of JSON.
+
+The load button allows the user to load the saved JSON file to popular all fields in this page.
+
+The JSON file includes the following information
+
+{
+  "biography_content": "text content",
+  "reference_image": "base64 of the image content",
+  "llm_response": { ... }, # the response from Gemini
+  "scenes": {
+    "scene1": {
+      "image": "base64 of the image content",
+      "image": "base64 of the image content",
+      "image": "base64 of the image content",
+    },
+  },  
+}
+
+===
+
+Saving JSON file works, but loading the JSON does not show the image correctly. Instead, there is only white blank where the image should be.
+
+===
+
+I want to be able to see a small preview of the Reference Image right once it is uploaded. Insert the image preview so that it is right where the file name currently lies, but also make the file name be displayed when the mouse hovers over the image preview.
+
+===
+
+I want the reference image to also be loaded when the user loads a session from the "Load Session" button.
+
+===
+
+I want to add a feature to create a button on the main webpage as the last step. The button is called "Generate Storyboard". This creates a new webpage. The new webpage can be a standalone webpage or can be embedded in the main webpage. It display all selected scenes. One scene at a time, with navigation buttons on the right and left sides. Each time it shows the title, the image, and human_text under the image. Scenes are selected by the user. User can select the image from each scene. Let's also allow the user to deselect the image from a scene. A scene can have at most one selected image or none. 
+
+===
+
+I want to add a feature to create a button on the main webpage after scenes are generated called "Generate Storyboard". This button when clicked creates a new webpage. The new webpage can be a standalone webpage or can be embedded in the main webpages. The webpage displays all scenes that have an image selected, one scene at a time, as pages with a forward and backwards button on the right and left side of the webpage. Each page shows the title of the scene, the image that the user selected for this scene, and the scene's human_text underneath the image. If the user has not selected any images or has not generated any images, do not let the user click this button. After clicked, two new buttons pop up below "Generate Storyboard". One lets the user view the storyboard webpage as an embed while the other opens it in a new tab.
+
+===
+
+Fix the buttons in the header so that the "Save Session" and "Generate Storyboard" buttons have the same style as "Load Session". Make all buttons green if they have a name that begins with "Generate".
+
+===
+
+Move the "Generate Storyboard" from the header of the page to the end of the "Generate Scenes" section (so that it hides when the "Hide" option is clicked). Also create a button to be placed right next to where "Generate Storyboard" will go, named "Open Storyboard in New Tab". This opens the Storyboard webpage in a new tab without embedding it in the same page.
+
+===
+
+You misunderstood the prompt. The Generate Storyboard and Open Storyboard in New Tab buttons were supposed to go in the "Generated Scenes" section, below all the generated scenes.
+
+===
+
+The button for Open Storyboard in New Tab should be in the same style as "Generate Storyboard". When the New Tab opens to display the storyboard, the storyboard should be in the same style as the embedded pop-up storyboard.
+
+===
+
+The new tab storyboard does not support flipping pages currently. Please fix the "Next >" and "< Previous" buttons. Also, the Open Storyboard in New Tab button does not create the storyboard until "Generate Storyboard" is clicked. Make it so that when the storyboard has not been generated and the "Open Storyboard in New Tab" button is clicked, the storyboard is generated just like if "Generate Storyboard" was used.
+
+===
+
+The Page Count in the New Tab storyboard begins reading "1 / 2", which is correct because it shows the first scene and there are two scenes. But when I click "Next >", it shows the second of the two scenes but the Page Count starts to read "0.5" when it should say "2 / 2". Please fix this.
+
+===
+
+The storyboard in a new tab is error-prone because the HTML and javascript are inlined within script.js. I often see browser console error due to string escape issue. lets do a refactoring to move the new tab storyboard to its own HTML template and javascript.
+
+===
+
+Make all "Generate Image" buttons and the "Open Storyboard in New Tab" button the same green color as "Generate Storyboard" button. Also make the Biography Text section collapsed by default. When I load a session from JSON file, I should see Biography Text collapsed.
+
+====
+
+I want to add a feature to generate videos based on selected images and text prompts. This happens inside of the image pop-up window. Inside this pop-up window, add three new buttons next to the "Download Image" button labeled "Generate Video", "Play Video", and "Download Video". "Play Video" and "Download Video" buttons are disabled and unable to be clicked by default unless a video has already been generated. 
+
+When clicked, the "Generate Video" button calls Fal API to use Kling v2.1 standard model to generate a video using the selected image as a reference image. The text prompt should be the "video_prompt" field from the Raw LLM Response for the scene that corresponds to that reference image. The duration of the generated video should be 5 seconds. Here is the Fal API for Kling 2.1 standard: https://fal.ai/models/fal-ai/kling-video/v2.1/standard/image-to-video/api
+
+After clicked, the "Generate Video" button should be temporarily disabled and unable to be clicked again until the video is finished generating. While the video is being generated, show a progress bar somewhere in the pop-up window to let the user know a video is being generated. The progress bar estimates the video to be fully generated after around one minute. Once the video is finished generating, enable the "Play Video" button and the "Download Video" button.
+
+Once the user clicks "Play Video", replace the image in the pop-up window with the video player and automatically start playing the video. Implement the "Download Video" button similar to "Download Image" button except downloading the video instead of the image.
+
+Include the video content in the Save Session JSON by encoding the video content in base64. Implement the "Save Session" and "Load Session" functions correctly.
+
+===
+
+The new buttons "Generate Video", "Play Video", and "Download Video" are too large. Fix them so that they are the same height as the "Download Image" button.
+
+===
+
+Whenever a request is made with Fal API to generate a video, print the information about the request to server logs. This information includes video prompt and the file name of the reference image.
+
+===
+
+Make the progress bar thinner to avoid pushing the buttons out of the pop-up window when the progress bar is shown. This is a minor CSS fix.
+
+If I save the session and load the session that contains a video, the "Play Video" button does not work, showing a video player that does not contain a playable video and showing a browser console error:
+
+script.js:673 Uncaught (in promise) NotSupportedError: The element has no supported sources.
+
+===
+
+I see too many "queue update" logs on the server side logs. Throttle the "queue update" logging to only log once every ten queue updates.
+
+
+====
+
+Make an update to the "Generate Storyboard" function. When a storyboard is generating from the "Generate Storyboard" button or the "Open Storyboard in New Tab" button, check for each scene whether the selected image corresponds to a generated video. If so, then show the video in a video player instead of the image and automatically play it when the user navigates to the slide with that video.
+
+===
+
+The storyboard function is broken. When I try to click "Generate Storyboard" or "Open Storyboard in New Tab", nothing happens. The browser console outputs this error message:
+
+script.js:495 Uncaught TypeError: Cannot read properties of null (reading 'style')
+    at displayCurrentStoryboardScene (script.js:495:29)
+    at generateStoryboard (script.js:454:9)
+    at HTMLButtonElement.<anonymous> (script.js:625:9)
+displayCurrentStoryboardScene	@	script.js:495
+generateStoryboard	@	script.js:454
+(anonymous)	@	script.js:625
+
+===
+
+Now, when I open the web app and try to Load Session, it doesn't work. As soon as I open the web app, this browser console error message appears:
+
+script.js:427 Uncaught SyntaxError: Identifier 'storyboardVideo' has already been declared
+
+===
+
+When the video is displayed in the pop-up window from clicking "Generate Storyboard", the video player is too large. Make the video player only as large as an image would be if there was an image instead of a video.
+
+When trying to use the "Open Storyboard in New Tab" button, nothing happens and this browser console error message occurs:
+script.js:626 Uncaught QuotaExceededError: Failed to execute 'setItem' on 'Storage': Setting the value of 'storyboardSelectedScenes' exceeded the quota.
+    at HTMLButtonElement.<anonymous> (script.js:626:22)
+(anonymous) @ script.js:626Understand this error
+
+===
+
+Now I am getting this error upon opening the web app.
+
+script.js:427 Uncaught SyntaxError: Identifier 'storyboardVideo' has already been declared (at script.js:427:7)Understand this error
